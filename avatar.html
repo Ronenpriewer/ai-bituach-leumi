@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ביטוח לאומי — נועה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#1A3766;--navy-dark:#0F2347;--navy-mid:#2A5298;--navy-tint:#E8F0FB;--gold:#C8923A;--white:#FFFFFF;--text:#0F1923;--text-mid:#4A5568;--text-lt:#718096;--border:#E2E8F0;--success:#2D7A4F;--success-bg:#E8F5EE;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;overflow:hidden;}
+    body{font-family:'Heebo',sans-serif;background:var(--navy-dark);direction:rtl;display:flex;flex-direction:column;height:100vh;}
+    .header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;position:relative;z-index:10;}
+    .logo{display:flex;align-items:baseline;gap:2px;text-decoration:none;}
+    .logo .ai{font-size:15px;font-weight:700;color:var(--gold);}
+    .logo .bl{font-size:15px;font-weight:600;color:var(--white);}
+    .back-link{font-size:13px;color:rgba(255,255,255,.55);text-decoration:none;display:flex;align-items:center;gap:4px;}
+    .mute-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:16px;color:rgba(255,255,255,.75);font-size:12px;font-family:'Heebo',sans-serif;padding:4px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+    .avatar-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-bottom:8px;}
+    .video-frame{position:relative;width:min(220px,48vw);height:min(280px,60vw);border-radius:50% 50% 50% 50%/55% 55% 45% 45%;overflow:hidden;box-shadow:0 0 0 3px rgba(200,146,58,.4),0 16px 48px rgba(0,0,0,.5);background:var(--navy);}
+    @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+    .video-frame{animation:breathe 3.5s ease-in-out infinite;}
+    #noa-video{width:100%;height:100%;object-fit:cover;display:none;}
+    #noa-video.active{display:block;}
+    #noa-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+    #noa-fallback.hidden{display:none;}
+    @keyframes blink{0%,91%,100%{transform:scaleY(0)}94%{transform:scaleY(1)}97%{transform:scaleY(0)}}
+    .eyelid{transform-box:fill-box;transform-origin:top center;transform:scaleY(0);animation:blink 3.8s ease-in-out infinite;}
+    #right-lid{animation-delay:0.07s;}
+    @keyframes idleHead{0%,100%{transform:rotate(0deg)}30%{transform:rotate(0.7deg)}70%{transform:rotate(-0.7deg)}}
+    #head-g{animation:idleHead 5s ease-in-out infinite;transform-origin:140px 220px;}
+    #mouth-closed{transition:opacity .09s;}
+    #mouth-open{opacity:0;transition:opacity .09s;}
+    .loading-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,35,71,.7);border-radius:inherit;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .loading-overlay.show{opacity:1;}
+    .loader{width:32px;height:32px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .name-badge{margin-top:10px;display:flex;align-items:center;gap:8px;}
+    .name-text{font-size:17px;font-weight:700;color:var(--white);}
+    .status-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:12px;padding:3px 10px;}
+    .sdot{width:6px;height:6px;border-radius:50%;background:#48BB78;animation:sdotP 2s ease-in-out infinite;}
+    @keyframes sdotP{0%,100%{opacity:1}50%{opacity:.5}}
+    .stext{font-size:11px;color:rgba(255,255,255,.6);}
+    .bottom{background:var(--white);border-radius:24px 24px 0 0;flex-shrink:0;max-height:55vh;display:flex;flex-direction:column;box-shadow:0 -8px 32px rgba(0,0,0,.25);overflow:hidden;}
+    .conn-banner{background:#FFF5F5;border:1px solid #FEB2B2;border-radius:10px;padding:10px 14px;font-size:12px;color:#C53030;margin:8px 14px 0;display:none;text-align:center;}
+    .conn-banner.show{display:block;}
+    .speech-wrap{padding:16px 16px 8px;flex-shrink:0;}
+    .speech-bubble{background:var(--navy-tint);border:1px solid rgba(42,82,152,.15);border-radius:14px;padding:12px 16px;font-size:14px;color:var(--navy-dark);line-height:1.6;min-height:48px;position:relative;}
+    .speech-bubble::before{content:'';position:absolute;top:-7px;right:28px;width:14px;height:7px;background:var(--navy-tint);clip-path:polygon(50% 0%,0% 100%,100% 100%);}
+    .typing-wrap{display:flex;gap:4px;align-items:center;}
+    .td{width:7px;height:7px;border-radius:50%;background:var(--navy-mid);animation:td 1.2s ease-in-out infinite;}
+    .td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+    @keyframes td{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+    .progress-wrap{padding:0 16px 8px;flex-shrink:0;}
+    .progress-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-lt);margin-bottom:4px;}
+    .progress-bg{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--navy-mid),var(--gold));border-radius:2px;transition:width .5s ease;width:0%;}
+    .replies-area{flex:1;overflow-y:auto;padding:4px 14px 16px;display:flex;flex-direction:column;gap:8px;}
+    .reply-btn{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);color:var(--text);font-size:14px;font-weight:500;font-family:'Heebo',sans-serif;cursor:pointer;text-align:right;transition:all .15s;display:flex;align-items:center;gap:10px;}
+    .reply-btn:hover:not(:disabled){border-color:var(--navy-mid);background:var(--navy-tint);color:var(--navy-dark);}
+    .reply-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .reply-btn.selected{border-color:var(--navy);background:var(--navy);color:var(--white);}
+    .reply-icon{width:30px;height:30px;border-radius:50%;background:var(--navy-tint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+    .reply-btn.selected .reply-icon{background:rgba(255,255,255,.2);}
+    .result-card{background:#F5F7FA;border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:slideUp .4s ease;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .result-top{padding:12px 14px;display:flex;align-items:center;gap:10px;}
+    .result-top.pos{background:var(--success-bg);}.result-top.neu{background:#FFFBEB;}
+    .result-emoji{font-size:26px;}
+    .rt-title{font-size:13px;font-weight:700;}
+    .rt-title.pos{color:var(--success);}.rt-title.neu{color:#B7791F;}
+    .rt-sub{font-size:11px;color:var(--text-mid);margin-top:2px;}
+    .result-body{padding:12px 14px;}
+    .rr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    .rr-label{font-size:12px;color:var(--text-lt);}.rr-val{font-size:16px;font-weight:700;color:var(--navy-dark);}
+    .rbar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+    .rbar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--navy-mid),var(--navy));}
+    .rfactors{margin-bottom:12px;}
+    .rfactor{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-mid);padding:4px 0;border-bottom:1px solid var(--border);}
+    .rfactor:last-child{border:none;}
+    .fdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    .fdot.pos{background:var(--success);}.fdot.neg{background:#E53E3E;}.fdot.neu{background:#D69E2E;}
+    .rcta{display:block;width:100%;padding:11px;border-radius:10px;background:var(--gold);color:var(--white);border:none;font-size:13px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s;}
+    .rcta:hover{background:#b07d30;}
+    .rnote{font-size:10px;color:var(--text-lt);text-align:center;margin-top:7px;line-height:1.4;}
+    .restart-wrap{padding:10px 14px 16px;display:flex;justify-content:center;}
+    .restart-btn{background:none;border:1px solid var(--border);border-radius:18px;padding:8px 20px;font-size:13px;color:var(--text-mid);font-family:'Heebo',sans-serif;cursor:pointer;}
+  </style>
+</head>
+<body>
+<div class="header">
+  <a href="register.html" class="back-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>חזרה</a>
+  <a href="index.html" class="logo"><span class="ai">AI</span><span class="bl"> ביטוח לאומי</span></a>
+  <button class="mute-btn" id="mute-btn" onclick="toggleMute()"><span id="mute-icon">🔊</span><span id="mute-lbl">השתק</span></button>
+</div>
+<div class="avatar-area">
+  <div class="video-frame" id="video-frame">
+    <video id="noa-video" autoplay playsinline></video>
+    <div id="noa-fallback">
+      <svg viewBox="0 0 280 310" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 310L0 245Q40 225 75 218L95 265Q115 252 140 248Q165 252 185 265L205 218Q240 225 280 245L280 310Z" fill="#1A3766"/>
+        <path d="M140 248L125 285L130 310L150 310L170 310L175 285Z" fill="#E8F0FB"/>
+        <path d="M128 238Q125 248 125 262L155 262Q155 248 152 238Z" fill="#F0C8A0"/>
+        <g id="head-g">
+          <ellipse cx="140" cy="112" rx="76" ry="60" fill="#1C0A05"/>
+          <path d="M66 138Q52 175 58 220Q68 185 76 162Z" fill="#1C0A05"/>
+          <path d="M214 138Q228 175 222 220Q212 185 204 162Z" fill="#1C0A05"/>
+          <ellipse cx="140" cy="162" rx="72" ry="82" fill="#F0C8A0"/>
+          <path d="M70 130Q85 75 140 70Q195 75 210 130Q185 98 140 95Q95 98 70 130Z" fill="#150805"/>
+          <ellipse cx="69" cy="165" rx="9" ry="12" fill="#DFB08C"/>
+          <ellipse cx="211" cy="165" rx="9" ry="12" fill="#DFB08C"/>
+          <path d="M104 130Q118 124 133 127" stroke="#2C1208" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M147 127Q162 124 176 130" stroke="#2C1208" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="118" cy="150" rx="17" ry="12" fill="white"/>
+          <ellipse cx="119" cy="150" rx="10" ry="10" fill="#5C3210"/>
+          <ellipse cx="119" cy="150" rx="6" ry="6" fill="#1C0805"/>
+          <ellipse cx="115" cy="146" rx="3" ry="2.5" fill="white"/>
+          <ellipse class="eyelid" id="left-lid" cx="118" cy="150" rx="17" ry="12" fill="#F0C8A0"/>
+          <ellipse cx="162" cy="150" rx="17" ry="12" fill="white"/>
+          <ellipse cx="161" cy="150" rx="10" ry="10" fill="#5C3210"/>
+          <ellipse cx="161" cy="150" rx="6" ry="6" fill="#1C0805"/>
+          <ellipse cx="157" cy="146" rx="3" ry="2.5" fill="white"/>
+          <ellipse class="eyelid" id="right-lid" cx="162" cy="150" rx="17" ry="12" fill="#F0C8A0"/>
+          <path d="M136 168Q132 180 137 185Q140 187 143 185Q148 180 144 168" fill="rgba(0,0,0,.07)"/>
+          <circle cx="136" cy="183" r="3" fill="rgba(150,80,50,.2)"/>
+          <circle cx="144" cy="183" r="3" fill="rgba(150,80,50,.2)"/>
+          <g id="mouth-closed"><path d="M122 200Q140 214 158 200" stroke="#C47A5A" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+          <g id="mouth-open" opacity="0">
+            <path d="M120 198Q140 192 160 198Q155 215 140 218Q125 215 120 198Z" fill="#A0453A"/>
+            <path d="M126 200Q140 196 154 200L152 207Q140 204 128 207Z" fill="white"/>
+            <ellipse cx="140" cy="212" rx="10" ry="4" fill="#D06060"/>
+          </g>
+          <ellipse cx="96" cy="178" rx="16" ry="11" fill="rgba(220,100,80,.12)"/>
+          <ellipse cx="184" cy="178" rx="16" ry="11" fill="rgba(220,100,80,.12)"/>
+        </g>
+      </svg>
+    </div>
+    <div class="loading-overlay" id="loading-overlay"><div class="loader"></div></div>
+  </div>
+  <div class="name-badge">
+    <span class="name-text">נועה</span>
+    <div class="status-pill"><div class="sdot" id="sdot"></div><span class="stext" id="stext">מתחברת...</span></div>
+  </div>
+</div>
+<div class="bottom">
+  <div class="conn-banner" id="conn-banner">מחוברת במצב חלופי — הכל עובד רגיל 👍</div>
+  <div class="speech-wrap">
+    <div class="speech-bubble" id="speech-bubble">
+      <div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-row"><span>בדיקת זכאות</span><span id="prog-step"></span></div>
+    <div class="progress-bg"><div class="progress-fill" id="prog-fill"></div></div>
+  </div>
+  <div class="replies-area" id="replies-area"></div>
+</div>
+<script>
+let muted=false,sessionId=null,peerConn=null,streamingOk=false,mouthTimer=null,answers={},claimType='';
+function startMouth(){let open=false;const speeds=[110,155,125,180,105,160];let si=0;function toggle(){open=!open;const mc=document.getElementById('mouth-closed');const mo=document.getElementById('mouth-open');if(mc)mc.style.opacity=open?'0':'1';if(mo)mo.style.opacity=open?'1':'0';si=(si+1)%speeds.length;mouthTimer=setTimeout(toggle,speeds[si]);}toggle();}
+function stopMouth(){clearTimeout(mouthTimer);mouthTimer=null;const mc=document.getElementById('mouth-closed');const mo=document.getElementById('mouth-open');if(mc)mc.style.opacity='1';if(mo)mo.style.opacity='0';}
+let hebrewVoice=null;
+function initTTS(){const load=()=>{const voices=speechSynthesis.getVoices();hebrewVoice=voices.find(v=>v.lang==='he-IL'&&v.name.toLowerCase().includes('female'))||voices.find(v=>v.lang==='he-IL')||voices.find(v=>v.lang.startsWith('he'))||voices[0];};speechSynthesis.onvoiceschanged=load;load();}
+initTTS();
+function speakFallback(text,cb){if(muted||!('speechSynthesis'in window)){startMouth();const dur=Math.max(1200,text.length*55);setTimeout(()=>{stopMouth();if(cb)setTimeout(cb,300);},dur);return;}speechSynthesis.cancel();const utt=new SpeechSynthesisUtterance(text);if(hebrewVoice)utt.voice=hebrewVoice;utt.lang='he-IL';utt.rate=0.88;utt.pitch=1.05;utt.onstart=startMouth;utt.onend=()=>{stopMouth();if(cb)setTimeout(cb,300);};utt.onerror=()=>{stopMouth();if(cb)setTimeout(cb,300);};speechSynthesis.speak(utt);}
+async function initHeyGen(){showLoading(true);setStatus('מתחברת...',false);try{const res=await fetch('/api/heygen-session',{method:'POST'});if(!res.ok)throw new Error('fail');const data=await res.json();if(data.error)throw new Error(data.error);sessionId=data.session_id;peerConn=new RTCPeerConnection({iceServers:data.ice_servers||[]});peerConn.ontrack=(e)=>{const video=document.getElementById('noa-video');video.srcObject=e.streams[0];video.classList.add('active');document.getElementById('noa-fallback').classList.add('hidden');streamingOk=true;showLoading(false);setStatus('מוכנה לעזור',true);};peerConn.onicecandidate=async(e)=>{if(e.candidate){await fetch('/api/heygen-ice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId,candidate:e.candidate})});}};peerConn.onconnectionstatechange=()=>{if(peerConn.connectionState==='failed')fallbackMode();};await peerConn.setRemoteDescription(new RTCSessionDescription(data.sdp));const answer=await peerConn.createAnswer();await peerConn.setLocalDescription(answer);await fetch('/api/heygen-start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId,sdp:answer})});setTimeout(()=>{if(!streamingOk)fallbackMode();},8000);}catch(err){fallbackMode();}}
+function fallbackMode(){streamingOk=false;showLoading(false);document.getElementById('conn-banner').classList.add('show');document.getElementById('noa-video').classList.remove('active');document.getElementById('noa-fallback').classList.remove('hidden');setStatus('מוכנה לעזור',true);}
+function speak(text,cb){setBubble(text);setStatus('מדברת...',true);if(streamingOk&&sessionId&&!muted){fetch('/api/heygen-task',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId,text})}).then(()=>{const dur=Math.max(2000,text.length*70);setTimeout(()=>{setStatus('מקשיבה לך',true);if(cb)setTimeout(cb,400);},dur);}).catch(()=>speakFallback(text,cb));}else{speakFallback(text,()=>{setStatus('מקשיבה לך',true);if(cb)setTimeout(cb,300);});}}
+function showLoading(show){document.getElementById('loading-overlay').classList.toggle('show',show);}
+function setBubble(text,typing=false){const b=document.getElementById('speech-bubble');b.innerHTML=typing?'<div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>':text;b.classList.toggle('speaking',!typing);}
+function setStatus(text,active){document.getElementById('stext').textContent=text;document.getElementById('sdot').style.background=active?'#68D391':'#48BB78';}
+function setProgress(cur,total){document.getElementById('prog-fill').style.width=total?Math.round(cur/total*100)+'%':'0%';document.getElementById('prog-step').textContent=cur>0?'שלב '+cur+' מתוך '+total:'';}
+function clearReplies(){document.getElementById('replies-area').innerHTML='';}
+function showReplies(opts,cb){clearReplies();const area=document.getElementById('replies-area');opts.forEach(opt=>{const btn=document.createElement('button');btn.className='reply-btn';const label=typeof opt==='string'?opt:opt.text;const icon=typeof opt==='string'?'💬':(opt.icon||'💬');btn.innerHTML='<span class="reply-icon">'+icon+'</span>'+label;btn.onclick=()=>{area.querySelectorAll('.reply-btn').forEach(b=>{b.disabled=true;b.style.opacity='.4';});btn.classList.add('selected');btn.style.opacity='1';setTimeout(()=>cb(opt),250);};area.appendChild(btn);});}
+function toggleMute(){muted=!muted;if(muted){speechSynthesis.cancel();stopMouth();}document.getElementById('mute-icon').textContent=muted?'🔇':'🔊';document.getElementById('mute-lbl').textContent=muted?'בטל השתקה':'השתק';}
+const flows={disability:[{q:"יש לך אבחנה רפואית רשמית ממרופא מומחה?",key:"diagnosis",opts:[{text:"כן, יש לי אבחנה מסמכת",icon:"✅",weight:2},{text:"אני בתהליך — פגישות בקרוב",icon:"🔄",weight:1},{text:"לא עדיין",icon:"❌",weight:0}],fu:{2:"מצוין — אבחנה מסמכת היא גורם מרכזי ✅",1:"בסדר, נציין ונמשיך.",0:"זה מאתגר קצת, אבל ממשיכים."}},{q:"כמה זמן את/ה סובל/ת מהמצב הרפואי?",key:"duration",opts:[{text:"יותר מ-12 חודשים",icon:"📅",weight:2},{text:"6 עד 12 חודשים",icon:"🗓️",weight:1},{text:"פחות מ-6 חודשים",icon:"⏱️",weight:0}],fu:{2:"משך זמן ממושך מחזק את התביעה.",1:"יש כאן בסיס, ממשיכים.",0:"מוקדם יחסית, אבל כדאי להתכונן."}},{q:"המצב הרפואי משפיע על יכולתך לעבוד?",key:"work",opts:[{text:"לא יכול/ה לעבוד כלל",icon:"🚫",weight:2},{text:"עובד/ת חלקית בקושי",icon:"⚡",weight:1},{text:"עובד/ת אך עם קושי",icon:"💪",weight:1}],fu:{2:"השפעה מלאה על כושר העבודה — גורם מרכזי.",1:"הגבלה חלקית נלקחת בחשבון.",0:"טוב לדעת."}},{q:"את/ה מעל גיל 18 ותושב/ת ישראל?",key:"basic",opts:[{text:"כן, אזרח/ית ותיק/ה",icon:"🇮🇱",weight:2},{text:"כן, אך עלייה לאחרונה",icon:"📋",weight:1},{text:"לא",icon:"❌",weight:-1}],fu:{2:"תנאי בסיסי — מאושר! ✅",1:"ייתכנו הגבלות, נבדוק.",0:"זה עלול להשפיע על הזכאות."}}],work_accident:[{q:"האירוע קרה במסגרת העבודה או בדרך אליה?",key:"where",opts:[{text:"בזמן העבודה עצמה",icon:"🏭",weight:2},{text:"בדרך לעבודה או ממנה",icon:"🚗",weight:2},{text:"לא בטוח",icon:"❓",weight:1}],fu:{2:"זה נחשב תאונת עבודה ברורה ✅",1:"גם דרך לעבודה מכוסה בחוק.",0:"נבדוק את הנסיבות."}},{q:"דיווחת על האירוע למעסיק?",key:"reported",opts:[{text:"כן, דיווחתי מייד",icon:"📝",weight:2},{text:"כן, אך לאחר זמן",icon:"⏰",weight:1},{text:"לא דיווחתי",icon:"❌",weight:0}],fu:{2:"דיווח מיידי — מצוין.",1:"עדיין תקף.",0:"מקשה, אך לא בלתי אפשרי."}},{q:"קיבלת טיפול רפואי לאחר האירוע?",key:"medical",opts:[{text:"כן, דרך קופת חולים",icon:"🏥",weight:2},{text:"כן, באופן פרטי",icon:"👨‍⚕️",weight:1},{text:"לא קיבלתי",icon:"❌",weight:0}],fu:{2:"תיעוד רפואי — מצוין ✅",1:"גם טיפול פרטי נחשב.",0:"חוסר בתיעוד מאתגר."}},{q:"נפגעת ביכולת לעבוד?",key:"impact",opts:[{text:"כן, לא יכול/ה לעבוד",icon:"🚫",weight:2},{text:"עובד/ת באופן חלקי",icon:"⚡",weight:1},{text:"חזרתי לעבוד מלא",icon:"✅",weight:1}],fu:{2:"פגיעה מלאה — גורם חשוב מאוד.",1:"גם פגיעה חלקית נספרת.",0:"טוב שחזרת. עדיין כדאי לבדוק."}}],income_support:[{q:"מה מצבך התעסוקתי כרגע?",key:"employment",opts:[{text:"לא עובד/ת כלל",icon:"🔍",weight:2},{text:"עובד/ת חלקית",icon:"⚡",weight:1},{text:"מחפש/ת עבודה",icon:"📋",weight:1}],fu:{2:"אי-תעסוקה — תנאי בסיסי לזכאות.",1:"תעסוקה חלקית עשויה לאפשר קצבה מדורגת.",0:"חיפוש פעיל מראה כוונות טובות."}},{q:"האם את/ה רשום/ה בלשכת התעסוקה?",key:"office",opts:[{text:"כן, רשום/ה ופעיל/ה",icon:"✅",weight:2},{text:"מתכנן/ת להירשם",icon:"📋",weight:1},{text:"לא רשום/ה",icon:"❌",weight:0}],fu:{2:"רישום בלשכה — מצוין ✅",1:"כדאי להירשם בהקדם.",0:"רישום בלשכה הוא חובה."}},{q:"מה גילך?",key:"age",opts:[{text:"25 עד 55",icon:"👤",weight:2},{text:"55 ומעלה",icon:"🧓",weight:2},{text:"מתחת לגיל 25",icon:"🧑",weight:1}],fu:{2:"קטגוריית גיל תואמת ✅",1:"מעל 55 — לעיתים תנאים טובים יותר.",0:"מתחת ל-25 יש תנאים שונים."}},{q:"יש לך נכסים או חסכונות משמעותיים?",key:"assets",opts:[{text:"לא, אין לי",icon:"✅",weight:2},{text:"יש לי מעט",icon:"💰",weight:1},{text:"כן, יש חסכונות",icon:"🏦",weight:0}],fu:{2:"אין נכסים — תנאי מרכזי ✅",1:"נכסים מועטים בדרך כלל לא פוסלים.",0:"נכסים עלולים להפחית זכאות."}}]};
+const claimNames={disability:"נכות כללית",work_accident:"תאונת עבודה",income_support:"הבטחת הכנסה"};
+function calcScore(){const flow=flows[claimType];let total=0,max=flow.length*2;flow.forEach(q=>{const a=answers[q.key];if(a!==undefined)total+=Math.max(0,a);});return Math.round((total/max)*100);}
+function showResult(){const score=calcScore();const flow=flows[claimType];const isPos=score>=50;const label=claimNames[claimType];const area=document.getElementById('replies-area');area.innerHTML='';let lo=10,hi=25;if(claimType==='disability'){if(score>=75){lo=40;hi=60;}else if(score>=50){lo=20;hi=40;}}else if(claimType==='work_accident'){if(score>=75){lo=15;hi=30;}else if(score>=50){lo=8;hi=20;}}const factors=flow.map(q=>({text:q.q.replace('?',''),type:answers[q.key]>=2?'pos':answers[q.key]===1?'neu':'neg'}));const rangeHTML=claimType!=='income_support'?'<div class="rr-row"><span class="rr-label">טווח נכות משוער</span><span class="rr-val">'+lo+'%–'+hi+'%</span></div><div class="rbar-bg"><div class="rbar-fill" style="width:'+Math.min(90,score)+'%"></div></div>':'<div class="rr-row"><span class="rr-label">רמת התאמה</span><span class="rr-val">'+score+'%</span></div><div class="rbar-bg"><div class="rbar-fill" style="width:'+score+'%"></div></div>';const card=document.createElement('div');card.className='result-card';card.innerHTML='<div class="result-top '+(isPos?'pos':'neu')+'"><span class="result-emoji">'+(isPos?'✅':'⚠️')+'</span><div><div class="rt-title '+(isPos?'pos':'neu')+'">'+(isPos?'סיכויי זכאות טובים':'זכאות אפשרית — כדאי לבדוק')+'</div><div class="rt-sub">'+label+' · הערכה ראשונית</div></div></div><div class="result-body">'+rangeHTML+'<div class="rfactors">'+factors.map(f=>'<div class="rfactor"><div class="fdot '+f.type+'"></div>'+f.text+'</div>').join('')+'</div><a href="report.html" class="rcta">קבל ניתוח מלא של המסמכים — 380 ₪</a><div class="rnote">* הערכה זו מבוססת על תשובותיך בלבד ואינה ייעוץ משפטי.</div></div>';area.appendChild(card);const rw=document.createElement('div');rw.className='restart-wrap';rw.innerHTML='<button class="restart-btn" onclick="restart()">↺ בדיקה מחדש</button>';area.appendChild(rw);}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+async function start(){setBubble('',true);setProgress(0,5);await delay(500);speak("שלום! אני נועה, הבוטית של AI ביטוח לאומי. אני כאן לעזור לך לבדוק אם מגיע לך משהו מביטוח לאומי. זה ייקח רק כמה דקות!",async()=>{showReplies([{text:"יופי, בואי נתחיל!",icon:"🚀"},{text:"יש לי שאלה קודם",icon:"❓"}],async(opt)=>{clearReplies();if((typeof opt==='string'?opt:opt.text).includes("שאלה")){speak("כמובן! כל המידע שתשתף/י נשמר בצורה מאובטחת בישראל בלבד.",()=>{showReplies([{text:"כן, מוכן/ה!",icon:"✅"}],()=>{clearReplies();askClaimType();});});}else{await delay(200);askClaimType();}});});}
+function askClaimType(){setProgress(1,5);speak("קודם כל — באיזה מצב את/ה נמצא/ת?",()=>{showReplies([{text:"יש לי מוגבלות או מחלה כרונית",icon:"🏥"},{text:"עברתי תאונת עבודה",icon:"⚠️"},{text:"אני במצב כלכלי קשה",icon:"💙"}],(opt)=>{clearReplies();const t=(typeof opt==='string'?opt:opt.text);if(t.includes("מוגבלות")||t.includes("מחלה")){claimType='disability';speak("מבינה. נכות כללית היא אחת התביעות הנפוצות — והרבה אנשים לא יודעים שמגיע להם. בואי נבדוק יחד.",()=>askQ(0));}else if(t.includes("תאונת")){claimType='work_accident';speak("תאונת עבודה היא זכות מוחלטת — גם אם עברה הרבה זמן. בואו נבדוק.",()=>askQ(0));}else{claimType='income_support';speak("הבטחת הכנסה היא רשת הביטחון של ביטוח לאומי. הרבה אנשים זכאים ולא יודעים. נבדוק.",()=>askQ(0));}});});}
+function askQ(idx){const flow=flows[claimType];if(idx>=flow.length){finishFlow();return;}const q=flow[idx];setProgress(idx+2,5);speak(q.q,()=>{showReplies(q.opts,(opt)=>{clearReplies();answers[q.key]=opt.weight;const fu=q.fu[opt.weight]||q.fu[1]||'';if(fu&&idx<flow.length-1){speak(fu,()=>askQ(idx+1));}else{askQ(idx+1);}});});}
+function finishFlow(){setProgress(5,5);speak("תודה על התשובות! אני מנתחת את הפרופיל שלך...",async()=>{await delay(600);const score=calcScore();const label=claimNames[claimType];if(score>=50){speak("נמצאו מאפיינים תואמים לתביעת "+label+". הנה ההערכה הראשונית שלך — זכור/י שהמסמכים הרפואיים יכולים לשנות את התמונה.",()=>{showResult();setStatus('הסתיים ✓',false);});}else{speak("יש כמה גורמים שכדאי לבדוק לעומק. הנה מה שמצאתי.",()=>{showResult();setStatus('הסתיים ✓',false);});}});}
+function restart(){answers={};claimType='';speechSynthesis.cancel();stopMouth();clearReplies();start();}
+window.addEventListener('beforeunload',()=>{if(sessionId){fetch('/api/heygen-stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId}),keepalive:true});}});
+initHeyGen().then(start).catch(()=>{fallbackMode();start();});
+</script>
+</body>
+</html>
