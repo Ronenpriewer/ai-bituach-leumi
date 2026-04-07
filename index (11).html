@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ביטוח לאומי — הידע שמגיע לך</title>
+  <meta name="description" content="AI מנתח את התיק הרפואי שלך, מזהה את הזכויות שלך, ומכין אותך לתביעה — כך שאתה מגיע לעורך הדין מוכן ובטוח.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #1A3766;
+      --navy-dark:  #0F2347;
+      --navy-mid:   #2A5298;
+      --navy-tint:  #E8F0FB;
+      --gold:       #C8923A;
+      --gold-light: #F5E6D0;
+      --off-white:  #F5F7FA;
+      --white:      #FFFFFF;
+      --text:       #0F1923;
+      --text-mid:   #4A5568;
+      --text-light: #718096;
+      --border:     #E2E8F0;
+      --success:    #2D7A4F;
+      --success-bg: #E8F5EE;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--white);
+      color: var(--text);
+      direction: rtl;
+      text-align: right;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.03); }
+    }
+
+    .animate { opacity: 0; animation: fadeUp .6s ease forwards; }
+    .animate.d1 { animation-delay: .1s; }
+    .animate.d2 { animation-delay: .2s; }
+    .animate.d3 { animation-delay: .3s; }
+    .animate.d4 { animation-delay: .4s; }
+    .animate.d5 { animation-delay: .5s; }
+
+    /* ─── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; right: 0; left: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      text-decoration: none;
+    }
+    .nav-logo .ai  { font-size: 20px; font-weight: 700; color: var(--gold); }
+    .nav-logo .bl  { font-size: 20px; font-weight: 600; color: var(--navy); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--navy); }
+
+    .nav-cta {
+      background: var(--navy);
+      color: var(--white) !important;
+      padding: 9px 22px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: var(--navy-dark); transform: translateY(-1px); }
+
+    .nav-mobile-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--navy);
+      font-size: 22px;
+    }
+
+    /* ─── HERO ───────────────────────────────────────────── */
+    .hero {
+      background: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      padding: 96px 5% 80px;
+      position: relative;
+      overflow: hidden;
+      min-height: 92vh;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 50%, rgba(200,146,58,.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 80%, rgba(42,82,152,.4) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--navy-mid), var(--gold));
+      opacity: .6;
+    }
+
+    /* Decorative grid lines */
+    .hero-grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.85);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 3.5vw, 46px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      color: var(--gold);
+      font-style: normal;
+      position: relative;
+    }
+    .hero h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; right: 0; left: 0;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,.7);
+      line-height: 1.75;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--white);
+      padding: 14px 28px;
+      border-radius: 28px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(200,146,58,.4);
+    }
+    .btn-primary:hover {
+      background: #b07d30;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(26,55,102,.3);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: rgba(255,255,255,.85);
+      padding: 14px 28px;
+      border-radius: 28px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Heebo', sans-serif;
+      text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,.25);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .15s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.6); transform: translateY(-1px); }
+
+    .hero-trust {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hero-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,.55);
+    }
+    .hero-trust-item svg { color: var(--success); flex-shrink: 0; }
+
+    /* Hero visual card */
+    .hero-visual {
+      background: var(--white);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08);
+      position: relative;
+    }
+    .hero-visual::before {
+      content: '';
+      position: absolute;
+      top: -1px; right: 24px; left: 24px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--navy-mid));
+      border-radius: 0 0 3px 3px;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .report-title-text { font-size: 14px; font-weight: 600; color: var(--navy); }
+    .report-subtitle { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+    .status-badge {
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background: var(--success-bg);
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    .report-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .report-letter {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: var(--navy-tint);
+      color: var(--navy-mid);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .report-row-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .report-row-desc { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+
+    .strength-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .strength-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .strength-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .strength-range { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .strength-bar-bg {
+      height: 8px;
+      background: var(--off-white);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .strength-bar-fill {
+      height: 100%;
+      width: 65%;
+      background: linear-gradient(90deg, var(--navy-mid), var(--navy));
+      border-radius: 4px;
+      transition: width .8s ease;
+    }
+    .strength-note { font-size: 11px; color: var(--text-light); margin-top: 6px; }
+
+
+    /* Section overrides — buttons outside dark hero use navy */
+    .pricing .btn-primary,
+    .hiw .btn-primary,
+    .positioning .btn-primary { background: var(--navy); box-shadow: 0 4px 16px rgba(26,55,102,.25); }
+    .pricing .btn-primary:hover,
+    .hiw .btn-primary:hover { background: var(--navy-dark); }
+    .pricing .btn-ghost,
+    .hiw .btn-ghost { color: var(--navy); border-color: var(--border); }
+    .pricing .btn-ghost:hover,
+    .hiw .btn-ghost:hover { border-color: var(--navy); }
+
+    /* ─── TRUST BAR ──────────────────────────────────────── */
+    .trust-bar {
+      background: var(--navy);
+      padding: 18px 5%;
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .trust-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.8);
+      font-size: 13px;
+    }
+    .trust-bar-item svg { color: var(--gold); }
+
+    /* ─── SECTION BASE ───────────────────────────────────── */
+    section { padding: 80px 5%; }
+
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(24px, 2.5vw, 36px);
+      font-weight: 700;
+      color: var(--navy-dark);
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-mid);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+
+    /* ─── POSITIONING ────────────────────────────────────── */
+    .positioning { background: var(--white); text-align: center; }
+    .positioning .section-sub { margin: 0 auto 48px; }
+
+    .pos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .pos-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: right;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .pos-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,55,102,.1); }
+    .pos-card-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--navy-tint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+    .pos-card h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+    .pos-card p  { font-size: 14px; color: var(--text-mid); line-height: 1.65; }
+
+    /* ─── HOW IT WORKS ───────────────────────────────────── */
+    .hiw { background: var(--off-white); text-align: center; }
+    .hiw .section-sub { margin: 0 auto 48px; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 36px;
+      right: 12%;
+      left: 12%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    }
+
+    .step-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: right;
+      position: relative;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,55,102,.1); }
+
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .step-card.featured .step-num { background: var(--gold); }
+
+    .step-card h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+    .step-card p  { font-size: 13px; color: var(--text-mid); line-height: 1.65; margin-bottom: 12px; }
+    .step-price   { font-size: 13px; font-weight: 600; color: var(--gold); }
+
+    /* ─── PRICING ────────────────────────────────────────── */
+    .pricing { background: var(--white); text-align: center; }
+    .pricing .section-sub { margin: 0 auto 48px; }
+
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tier-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: right;
+      transition: transform .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .tier-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 3px;
+      background: var(--border);
+    }
+    .tier-card.featured {
+      background: var(--navy-dark);
+      border-color: var(--navy-dark);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 48px rgba(15,35,71,.3);
+    }
+    .tier-card.featured::before { background: linear-gradient(90deg, var(--gold), var(--navy-mid)); }
+    .tier-card.featured h3,
+    .tier-card.featured .tier-price,
+    .tier-card.featured .tier-desc,
+    .tier-card.featured li { color: rgba(255,255,255,.9) !important; }
+    .tier-card.featured .tier-tag { background: rgba(200,146,58,.2); color: var(--gold); }
+
+    .tier-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 12px;
+      border-radius: 10px;
+      background: var(--navy-tint);
+      color: var(--navy-mid);
+      margin-bottom: 16px;
+    }
+    .tier-card h3 { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+    .tier-price { font-size: 32px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+    .tier-price span { font-size: 16px; font-weight: 400; color: var(--text-light); }
+    .tier-desc { font-size: 13px; color: var(--text-mid); margin-bottom: 20px; line-height: 1.6; }
+    .tier-list { list-style: none; margin-bottom: 24px; }
+    .tier-list li {
+      font-size: 13px;
+      color: var(--text-mid);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tier-list li::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; }
+    .tier-card.featured .tier-list li { border-color: rgba(255,255,255,.1); }
+
+    .tier-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: var(--navy-tint);
+      color: var(--navy);
+      transition: background .2s, transform .15s;
+    }
+    .tier-btn:hover { background: var(--navy); color: var(--white); }
+    .tier-card.featured .tier-btn {
+      background: var(--gold);
+      color: var(--white);
+    }
+    .tier-card.featured .tier-btn:hover { background: #b07d30; }
+
+    .pricing-note {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-light);
+      text-align: center;
+    }
+    .pricing-note strong { color: var(--navy); }
+
+    /* ─── REPORT SECTION ─────────────────────────────────── */
+    .report-section { background: var(--off-white); }
+    .report-section .section-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .deliverables { display: flex; flex-direction: column; gap: 20px; }
+
+    .deliverable {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: transform .2s, border-color .2s;
+    }
+    .deliverable:hover { transform: translateX(-4px); border-color: var(--navy-mid); }
+
+    .deliverable-letter {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .deliverable h4 { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+    .deliverable p  { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+    /* ─── NOT ANTI ────────────────────────────────────────── */
+    .not-anti { background: var(--navy-dark); text-align: center; }
+    .not-anti .section-title { color: var(--white); }
+    .not-anti .section-sub   { color: rgba(255,255,255,.65); margin: 0 auto 48px; }
+
+    .not-anti-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .not-anti-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: right;
+    }
+    .not-anti-card h4 { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+    .not-anti-card p  { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.65; }
+    .not-anti-icon { font-size: 24px; margin-bottom: 14px; }
+
+    /* ─── ADVISORS ───────────────────────────────────────── */
+    .advisors { background: var(--white); text-align: center; }
+    .advisors .section-sub { margin: 0 auto 48px; }
+
+    .advisor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .advisor-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      text-align: right;
+      transition: transform .2s;
+    }
+    .advisor-card:hover { transform: translateY(-4px); }
+    .advisor-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .advisor-card h4 { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+    .advisor-card p  { font-size: 13px; color: var(--text-mid); line-height: 1.55; }
+    .advisor-tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 8px;
+      background: var(--navy-tint);
+      color: var(--navy-mid);
+      margin-top: 8px;
+    }
+
+    /* ─── LEAD MAGNET ────────────────────────────────────── */
+    .magnet { background: var(--off-white); }
+    .magnet-inner {
+      max-width: 560px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(26,55,102,.08);
+    }
+    .magnet-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gold);
+      background: var(--gold-light);
+      padding: 4px 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .magnet-inner h2 { font-size: 22px; font-weight: 700; color: var(--navy-dark); margin-bottom: 10px; }
+    .magnet-inner p { font-size: 14px; color: var(--text-mid); line-height: 1.7; margin-bottom: 28px; }
+
+    .magnet-form { display: flex; gap: 10px; flex-wrap: wrap; }
+    .magnet-input {
+      flex: 1; min-width: 200px;
+      padding: 12px 18px;
+      border-radius: 24px;
+      border: 1.5px solid var(--border);
+      font-size: 14px;
+      font-family: 'Heebo', sans-serif;
+      color: var(--text);
+      background: var(--off-white);
+      direction: rtl;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .magnet-input:focus { border-color: var(--navy-mid); }
+    .magnet-submit {
+      padding: 12px 24px;
+      border-radius: 24px;
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+    .magnet-submit:hover { background: #b07d30; transform: translateY(-1px); }
+    .magnet-note { font-size: 12px; color: var(--text-light); margin-top: 12px; }
+
+    /* ─── CTA FINAL ──────────────────────────────────────── */
+    .cta-final {
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+      text-align: center;
+    }
+    .cta-final h2 { font-size: clamp(22px, 2.5vw, 36px); font-weight: 700; color: var(--white); margin-bottom: 12px; }
+    .cta-final p  { font-size: 16px; color: rgba(255,255,255,.65); margin-bottom: 36px; }
+    .cta-final .btn-primary { background: var(--gold); box-shadow: 0 4px 16px rgba(200,146,58,.35); }
+    .cta-final .btn-primary:hover { background: #b07d30; }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      background: var(--navy-dark);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 40px 5% 24px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .footer-logo .ai { font-size: 18px; font-weight: 700; color: var(--gold); }
+    .footer-logo .bl { font-size: 18px; font-weight: 600; color: var(--white); }
+    .footer-tagline   { font-size: 13px; color: rgba(255,255,255,.45); margin-top: 4px; }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,.5); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy  { font-size: 12px; color: rgba(255,255,255,.3); }
+    .footer-legal { font-size: 12px; color: rgba(255,255,255,.3); }
+
+    /* ─── WA FLOAT ───────────────────────────────────────── */
+    .wa-float {
+      position: fixed;
+      bottom: 28px;
+      left: 28px;
+      z-index: 99;
+    }
+    .wa-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 28px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(37,211,102,.35);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,.4); }
+    .wa-icon { width: 20px; height: 20px; }
+
+    /* ─── MOBILE NAV MENU ────────────────────────────────── */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px; right: 0; left: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 5% 20px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 15px;
+      color: var(--text-mid);
+      text-decoration: none;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      display: block;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu .mob-cta {
+      margin-top: 8px;
+      display: block;
+      text-align: center;
+      background: var(--navy);
+      color: var(--white) !important;
+      padding: 14px;
+      border-radius: 24px;
+      font-weight: 600;
+      border-bottom: none !important;
+    }
+
+    /* ─── RESPONSIVE — TABLET ────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 4%; }
+      .nav-links { display: none; }
+      .nav-mobile-btn { display: block; }
+
+      .hero {
+        min-height: auto;
+        padding: 96px 5% 60px;
+        text-align: center;
+      }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .hero-visual { display: none; }
+      .hero-badge  { margin: 0 auto 20px; }
+      .hero-sub    { margin: 0 auto 28px; }
+      .hero-trust  { align-items: center; }
+      .hero-actions { justify-content: center; }
+
+      .pos-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .steps    { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .steps::before { display: none; }
+      .tiers    { grid-template-columns: 1fr; max-width: 460px; }
+      .tier-card.featured { transform: none; }
+      .report-section .section-inner { grid-template-columns: 1fr; gap: 32px; }
+      .not-anti-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .advisor-grid  { grid-template-columns: 1fr; }
+      .footer-top    { flex-direction: column; gap: 20px; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 6px; }
+    }
+
+    /* ─── RESPONSIVE — MOBILE ────────────────────────────── */
+    @media (max-width: 580px) {
+      section { padding: 52px 5%; }
+
+      /* Hero */
+      .hero { padding: 88px 5% 52px; text-align: center; }
+      .hero h1 { font-size: 28px; line-height: 1.3; }
+      .hero-sub { font-size: 15px; max-width: 100%; }
+      .hero-actions { flex-direction: column; gap: 10px; }
+      .btn-primary, .btn-ghost { width: 100%; justify-content: center; padding: 15px 20px; font-size: 15px; }
+      .hero-trust { align-items: flex-start; }
+      .hero-badge { font-size: 12px; }
+
+      /* Trust bar */
+      .trust-bar { flex-direction: column; gap: 12px; padding: 20px 5%; text-align: right; }
+
+      /* Section titles */
+      .section-title { font-size: 24px; }
+      .section-sub   { font-size: 14px; margin-bottom: 32px; }
+
+      /* Positioning */
+      .pos-grid { grid-template-columns: 1fr; }
+      .pos-card { padding: 20px; }
+
+      /* Steps */
+      .steps { grid-template-columns: 1fr; gap: 10px; }
+      .step-card { padding: 20px; }
+
+      /* Pricing */
+      .tiers { max-width: 100%; }
+      .tier-card { padding: 22px 18px; }
+      .tier-price { font-size: 28px; }
+
+      /* Report section */
+      .deliverable { padding: 16px; }
+
+      /* Not anti */
+      .not-anti-grid { grid-template-columns: 1fr; }
+      .not-anti { padding: 52px 5%; }
+
+      /* Advisors */
+      .advisor-card { padding: 18px; }
+
+      /* Lead magnet */
+      .magnet-inner { padding: 28px 20px; }
+      .magnet-form  { flex-direction: column; }
+      .magnet-input { min-width: 100%; }
+      .magnet-submit { width: 100%; padding: 14px; }
+      .magnet-inner h2 { font-size: 19px; }
+
+      /* CTA final */
+      .cta-final { padding: 52px 5%; }
+      .cta-final h2 { font-size: 22px; }
+
+      /* Footer */
+      .footer-links { gap: 14px; }
+      .footer-bottom { flex-direction: column; gap: 6px; }
+      .footer-copy, .footer-legal { text-align: center; }
+
+      /* WhatsApp — show icon only on small screens */
+      .wa-btn { padding: 12px 14px; }
+      .wa-btn span { display: none; }
+      .wa-float { bottom: 20px; left: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo" aria-label="AI ביטוח לאומי">
+    <span class="ai">AI</span>
+    <span class="bl"> ביטוח לאומי</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">איך זה עובד</a></li>
+    <li><a href="#pricing">מסלולים</a></li>
+    <li><a href="#report">הדוח</a></li>
+    <li><a href="register.html" class="nav-cta">התחל חינם</a></li>
+  </ul>
+  <button class="nav-mobile-btn" aria-label="תפריט" onclick="toggleMenu()">☰</button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how" onclick="closeMenu()">איך זה עובד</a>
+  <a href="#pricing" onclick="closeMenu()">מסלולים ומחירים</a>
+  <a href="#report" onclick="closeMenu()">הדוח שלך</a>
+  <a href="register.html" onclick="closeMenu()" class="mob-cta">התחל חינם</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge animate d1">AI לזכויותיך מול ביטוח לאומי</div>
+      <h1 class="animate d2">לפני שאתה הולך לעורך דין —<br><em>דע בדיוק מה מגיע לך</em></h1>
+      <p class="hero-sub animate d3">
+        AI מנתח את התיק הרפואי שלך, מזהה את הסעיפים הרלוונטיים, ומכין אותך לתביעה — כך שאתה מגיע לעורך הדין מוכן, בטוח, ומרוויח.
+      </p>
+      <div class="hero-actions animate d4">
+        <a href="register.html" class="btn-primary">בדוק את הזכאות שלי — חינם</a>
+        <a href="#how" class="btn-ghost">איך זה עובד?</a>
+      </div>
+      <div class="hero-trust animate d5">
+        <div class="hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          כל הנתונים מאוחסנים בישראל בלבד
+        </div>
+        <div class="hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          מאובטח על ידי מומחי סייבר ישראלים
+        </div>
+        <div class="hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ניתוח ראשוני תוך דקות · ללא התחייבות
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero visual: sample report card -->
+    <div class="hero-visual animate d3">
+      <div class="report-header">
+        <div>
+          <div class="report-title-text">דוח ניתוח תביעה</div>
+          <div class="report-subtitle">AI ביטוח לאומי · נכות כללית</div>
+        </div>
+        <span class="status-badge">מוכן ✓</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-letter">א</div>
+        <div>
+          <div class="report-row-name">ניתוח כרונולוגי</div>
+          <div class="report-row-desc">ציר זמן מסודר של כל האבחנות מ-2019 עד היום</div>
+        </div>
+      </div>
+      <div class="report-row">
+        <div class="report-letter">ב</div>
+        <div>
+          <div class="report-row-name">סעיפים רלוונטיים</div>
+          <div class="report-row-desc">3 סעיפים בתקנות ביטוח לאומי שעשויים לחול עליך</div>
+        </div>
+      </div>
+      <div class="report-row">
+        <div class="report-letter">ג</div>
+        <div>
+          <div class="report-row-name">פעולות מומלצות</div>
+          <div class="report-row-desc">7 פעולות ברורות לפני הגשת התביעה</div>
+        </div>
+      </div>
+
+      <div class="strength-section">
+        <div class="strength-top">
+          <span class="strength-label">הערכת חוזק התביעה</span>
+          <span class="strength-range">25%–40%</span>
+        </div>
+        <div class="strength-bar-bg">
+          <div class="strength-bar-fill"></div>
+        </div>
+        <div class="strength-note">מבוסס על המסמכים שסופקו. גורמים שיכולים להשפיע: בדיקת MRI עדכנית, חוות דעת רופא תעסוקתי</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-bar-item">
+    <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    מאובטח ומוגן — נתוניך לא יוצאים מישראל
+  </div>
+  <div class="trust-bar-item">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    יועצי AI ומשפטים ישראלים מובילים
+  </div>
+  <div class="trust-bar-item">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    מאות תיקים אמיתיים בבסיס הידע
+  </div>
+  <div class="trust-bar-item">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    לא ייעוץ משפטי — הכנה לייעוץ משפטי
+  </div>
+</div>
+
+<!-- POSITIONING -->
+<section class="positioning">
+  <div class="section-inner">
+    <div class="section-tag animate">המשימה שלנו</div>
+    <h2 class="section-title animate d1">לא נגד עורכי דין.<br>בשבילך, לפניהם.</h2>
+    <p class="section-sub animate d2">
+      אנחנו לא מחליפים עורכי דין — אנחנו מכינים אותך אליהם. לקוח שמגיע לפגישה עם הבנה מלאה של תיקו מקבל ייצוג טוב יותר. זה טוב לך, וטוב לעורך הדין.
+    </p>
+    <div class="pos-grid">
+      <div class="pos-card animate d1">
+        <div class="pos-card-icon">🧠</div>
+        <h3>הבנה</h3>
+        <p>AI קורא את המסמכים הרפואיים שלך ומסביר לך בעברית פשוטה מה משמעותם מול ביטוח לאומי — ללא עמימות וללא ז'רגון.</p>
+      </div>
+      <div class="pos-card animate d2">
+        <div class="pos-card-icon">⚡</div>
+        <h3>חיסכון</h3>
+        <p>שעות של חיפוש, בלבול וחרדה מצטמצמות לדוח ברור שמוכן בזמן שאתה ישן. הזמן שלך שווה כסף.</p>
+      </div>
+      <div class="pos-card animate d3">
+        <div class="pos-card-icon">💪</div>
+        <h3>כוח</h3>
+        <p>נכנסים לפגישה עם עורך הדין כשאתה כבר מבין את התיק שלך, יודע מה לשאול, ויודע מה מגיע לך.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw" id="how">
+  <div class="section-inner">
+    <div class="section-tag animate">התהליך</div>
+    <h2 class="section-title animate d1">איך זה עובד?</h2>
+    <p class="section-sub animate d2">ארבעה מסלולים. בחר את מה שמתאים לך. שלם רק מה שצריך.</p>
+    <div class="steps">
+      <div class="step-card animate d1">
+        <div class="step-num">0</div>
+        <h3>בדיקת זכאות</h3>
+        <p>בוט AI חכם שואל אותך שאלות ממוקדות — ומגיד לך אם בכלל כדאי להגיש תביעה ולאיזה סוג.</p>
+        <div class="step-price">180 ₪ · ללא מסמכים</div>
+      </div>
+      <div class="step-card featured animate d2">
+        <div class="step-num">1</div>
+        <h3>ניתוח מסמכים</h3>
+        <p>מעלה את המסמכים הרפואיים שלך — ה-AI מנתח הכל ומפיק דוח A–D מקיף עם סיכויים ואחוזים.</p>
+        <div class="step-price">380 ₪ דיגיטלי · 580 ₪ עם איסוף</div>
+      </div>
+      <div class="step-card animate d3">
+        <div class="step-num">2</div>
+        <h3>חוות דעת משפטית</h3>
+        <p>בוחר עורך דין ממאגר המומחים. הוא כבר קיבל את הדוח — לא מסביר שוב מההתחלה.</p>
+        <div class="step-price">מחיר לפי עורך הדין</div>
+      </div>
+      <div class="step-card animate d4">
+        <div class="step-num">3</div>
+        <h3>ליווי לוועדה</h3>
+        <p>עורך דין מגיע איתך פיזית לוועדת ביטוח לאומי. לא לבד, לא מבולבל, לא מופתע.</p>
+        <div class="step-price">מחיר לפי ליווי</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="section-tag animate">מחירים</div>
+    <h2 class="section-title animate d1">שלם רק את מה שאתה צריך</h2>
+    <p class="section-sub animate d2">ה-180 ₪ ששילמת בבדיקת הזכאות מנוכים מהמסלול הבא. אין תשלום כפול.</p>
+    <div class="tiers">
+      <div class="tier-card animate d1">
+        <div class="tier-tag">מסלול 0</div>
+        <h3>בדיקת זכאות</h3>
+        <div class="tier-price">חינם<span style="font-size:14px"> לחלוטין</span></div>
+        <div class="tier-desc">האם בכלל כדאי להגיש? קבל תשובה ברורה תוך דקות — ללא מסמכים.</div>
+        <ul class="tier-list">
+          <li>שיחה עם בוט AI חכם</li>
+          <li>בדיקת 3 סוגי תביעות</li>
+          <li>המלצה ברורה — כן / לא</li>
+          <li>תוצאה מיידית</li>
+        </ul>
+        <a href="register.html" class="tier-btn" style="display:block;text-align:center;text-decoration:none">התחל עכשיו</a>
+      </div>
+
+      <div class="tier-card featured animate d2">
+        <div class="tier-tag">הכי פופולרי</div>
+        <h3>ניתוח AI מלא</h3>
+        <div class="tier-price">380 <span>₪ (דיגיטלי)</span></div>
+        <div class="tier-desc">מעלה מסמכים בעצמך ומקבל את הדוח המקיף — כולל אחוזים וסעיפים.</div>
+        <ul class="tier-list">
+          <li>ניתוח כרונולוגי מלא</li>
+          <li>סעיפי תביעה רלוונטיים</li>
+          <li>פעולות מומלצות מפורטות</li>
+          <li>הערכת חוזק + טווח אחוזים</li>
+        </ul>
+        <a href="register.html" class="tier-btn" style="display:block;text-align:center;text-decoration:none">התחל עכשיו</a>
+      </div>
+
+      <div class="tier-card animate d3">
+        <div class="tier-tag">עם ליווי מהבית</div>
+        <h3>ניתוח עם איסוף</h3>
+        <div class="tier-price">580 <span>₪</span></div>
+        <div class="tier-desc">אנחנו אוספים את המסמכים מהבית ומחזירים — מושלם אם קשה לסרוק.</div>
+        <ul class="tier-list">
+          <li>כל מה שבמסלול הדיגיטלי</li>
+          <li>איסוף מסמכים מהבית</li>
+          <li>החזרה לאחר הניתוח</li>
+          <li>מתאים לקשישים ונכים</li>
+        </ul>
+        <a href="register.html" class="tier-btn" style="display:block;text-align:center;text-decoration:none">התחל עכשיו</a>
+      </div>
+    </div>
+    <div class="pricing-note">* בדיקת הזכאות חינמית לחלוטין · נדרש רישום עם אימות טלפון בלבד</div>
+  </div>
+</section>
+
+<!-- REPORT SECTION -->
+<section class="report-section" id="report">
+  <div class="section-inner">
+    <div>
+      <div class="section-tag animate">הדוח שלך</div>
+      <h2 class="section-title animate d1">מה מקבלים בדוח?</h2>
+      <p class="section-sub animate d2" style="margin-bottom:0">לקוח עם הדוח הזה הוא לקוח שמגיע לעורך הדין מוכן לחלוטין — לא עם שקית ניירות.</p>
+    </div>
+    <div class="deliverables">
+      <div class="deliverable animate d1">
+        <div class="deliverable-letter">א</div>
+        <div>
+          <h4>ניתוח כרונולוגי מלא</h4>
+          <p>ציר זמן מסודר של כל האבחנות, האירועים הרפואיים והרופאים המטפלים — מ-2019 עד היום. הופך שקית ניירות לסיפור ברור.</p>
+        </div>
+      </div>
+      <div class="deliverable animate d2">
+        <div class="deliverable-letter">ב</div>
+        <div>
+          <h4>סעיפי תביעה רלוונטיים</h4>
+          <p>הסעיפים בתקנות ביטוח לאומי שעשויים לחול על מצבך — כמידע בלבד, לא כייעוץ משפטי. מגן על החשיפה הרגולטורית שלנו ועל שלך.</p>
+        </div>
+      </div>
+      <div class="deliverable animate d3">
+        <div class="deliverable-letter">ג</div>
+        <div>
+          <h4>רשימת פעולות מומלצות</h4>
+          <p>שלוש קטגוריות: פעולות רפואיות (בדיקות, מומחים), אדמיניסטרטיביות (מסמכים, טפסים), ואסטרטגיות (תזמון, מה לעשות לפני הגשה).</p>
+        </div>
+      </div>
+      <div class="deliverable animate d4">
+        <div class="deliverable-letter">ד</div>
+        <div>
+          <h4>הערכת חוזק + טווח אחוזים</h4>
+          <p>הערכה כנה של חוזק התביעה ​+ טווח אחוזי נכות משוערים (לדוגמה 25%–40%) עם הסבר מפורט של הגורמים שמשפיעים לכל כיוון. לא מספר בודד — תמיד טווח.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOT ANTI LAWYERS -->
+<section class="not-anti">
+  <div class="section-inner">
+    <div class="section-tag" style="color:var(--gold)">הגישה שלנו</div>
+    <h2 class="section-title animate d1">AI ביטוח לאומי לא מחליף עורכי דין —<br>הוא הופך אותך ללקוח טוב יותר שלהם</h2>
+    <p class="section-sub animate d2">עורך דין טוב עובד הכי טוב עם לקוח שמבין את התיק שלו. אנחנו דואגים שזה תהיה אתה.</p>
+    <div class="not-anti-grid">
+      <div class="not-anti-card animate d1">
+        <div class="not-anti-icon">🤝</div>
+        <h4>שותפות, לא תחרות</h4>
+        <p>עורכי דין ממאגר שלנו מקבלים לקוחות מוכנים — פגישה ראשונה אפקטיבית יותר, תיק ברור יותר, תוצאה טובה יותר.</p>
+      </div>
+      <div class="not-anti-card animate d2">
+        <div class="not-anti-icon">⚖️</div>
+        <h4>מידע, לא ייעוץ</h4>
+        <p>אנחנו מספקים מידע וניתוח — לא ייעוץ משפטי. השיפוט, האסטרטגיה והייצוג נשארים אצל עורך הדין.</p>
+      </div>
+      <div class="not-anti-card animate d3">
+        <div class="not-anti-icon">🚀</div>
+        <h4>לקוח מוכן = עורך דין טוב יותר</h4>
+        <p>לקוח שמבין את תיקו חוסך לעורך הדין שעות של הסברים בסיסיים. כולם מרוויחים — כולל אתה.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVISORS -->
+<section class="advisors">
+  <div class="section-inner">
+    <div class="section-tag animate">גיבוי מקצועי</div>
+    <h2 class="section-title animate d1">מי עומד מאחורינו</h2>
+    <p class="section-sub animate d2">לוח יועצים המורכב ממומחים ישראלים מובילים בתחום המשפט, ה-AI והסייבר — כי מידע רפואי ומשפטי מחייב את הרמה הגבוהה ביותר של הגנה ואחריות.</p>
+    <div class="advisor-grid">
+      <div class="advisor-card animate d1">
+        <div class="advisor-avatar">AI</div>
+        <div>
+          <h4>יועץ משפטי — דיני AI</h4>
+          <p>עורך דין מוביל בתחום הבינה המלאכותית והגנת הפרטיות בישראל. מפקח על הניסוח המשפטי של כל פלט ה-AI ועל תאימות לחוק הישראלי.</p>
+          <span class="advisor-tag">משפטי</span>
+        </div>
+      </div>
+      <div class="advisor-card animate d2">
+        <div class="advisor-avatar">CY</div>
+        <div>
+          <h4>יועץ סייבר ואבטחת מידע</h4>
+          <p>בכיר מתעשיית הסייבר הישראלית. מפקח על ארכיטקטורת האבטחה של הפלטפורמה ועל אחסון המידע הרפואי.</p>
+          <span class="advisor-tag">סייבר</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAD MAGNET -->
+<section class="magnet" id="magnet">
+  <div class="section-inner">
+    <div class="magnet-inner animate">
+      <div class="magnet-tag">חינם לחלוטין</div>
+      <h2>המדריך שביטוח לאומי לא רוצה שתראה</h2>
+      <p>10 דברים שביטוח לאומי לא יגיד לך — ושיכולים לשנות את תוצאת התביעה שלך. PDF חינמי, נשלח מיידית לאימייל שלך.</p>
+      <div class="magnet-form">
+        <input class="magnet-input" type="email" placeholder="כתובת האימייל שלך" aria-label="אימייל">
+        <button class="magnet-submit">שלח לי את המדריך</button>
+      </div>
+      <div class="magnet-note">ללא ספאם · ניתן להסיר בכל עת · הפרטיות שלך מוגנת</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-final">
+  <div class="section-inner">
+    <h2 class="animate">מוכן לדעת מה מגיע לך?</h2>
+    <p class="animate d1">בדיקת זכאות ראשונית — חינם לחלוטין. ללא מסמכים, ללא התחייבות, תוצאה תוך דקות.</p>
+    <a href="register.html" class="btn-primary animate d2">התחל עכשיו</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <span class="ai">AI</span><span class="bl"> ביטוח לאומי</span>
+        </div>
+        <div class="footer-tagline">הידע שמגיע לך</div>
+      </div>
+      <div class="footer-links">
+        <a href="#">אודות</a>
+        <a href="#">פרטיות</a>
+        <a href="#">תנאי שימוש</a>
+        <a href="#">נגישות</a>
+        <a href="#">צור קשר</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 AI ביטוח לאומי · כל הזכויות שמורות</div>
+      <div class="footer-legal">המידע באתר אינו מהווה ייעוץ משפטי · לייעוץ משפטי פנה לעורך דין מוסמך</div>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/972XXXXXXXXX" class="wa-btn wa-float" target="_blank" rel="noopener" aria-label="דברו איתנו בווטסאפ">
+  <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.529 5.845L.057 23.454a.75.75 0 00.918.918l5.609-1.472A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.722 9.722 0 01-4.964-1.363l-.356-.211-3.692.968.983-3.595-.231-.369A9.722 9.722 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+  </svg>
+  <span>דברו איתנו בווטסאפ</span>
+</a>
+
+<script>
+  // Scroll-triggered animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animationPlayState = 'running';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.animate').forEach(el => {
+    el.style.animationPlayState = 'paused';
+    observer.observe(el);
+  });
+
+  // Strength bar animation
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = '65%';
+      }
+    });
+  }, { threshold: 0.5 });
+
+  const fill = document.querySelector('.strength-bar-fill');
+  if (fill) {
+    fill.style.width = '0%';
+    barObserver.observe(fill);
+  }
+
+  // Mobile menu
+  function toggleMenu() {
+    const m = document.getElementById('mobileMenu');
+    const btn = document.querySelector('.nav-mobile-btn');
+    m.classList.toggle('open');
+    btn.textContent = m.classList.contains('open') ? '✕' : '☰';
+  }
+  function closeMenu() {
+    const m = document.getElementById('mobileMenu');
+    const btn = document.querySelector('.nav-mobile-btn');
+    m.classList.remove('open');
+    btn.textContent = '☰';
+  }
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('nav') && !e.target.closest('.mobile-menu')) closeMenu();
+  });
+  // Close on scroll
+  window.addEventListener('scroll', closeMenu, { passive: true });
+</script>
+</body>
+</html>

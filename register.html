@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ביטוח לאומי — הרשמה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #1A3766;
+      --navy-dark: #0F2347;
+      --navy-mid:  #2A5298;
+      --navy-tint: #E8F0FB;
+      --gold:      #C8923A;
+      --gold-lt:   #F5E6D0;
+      --off-white: #F5F7FA;
+      --white:     #FFFFFF;
+      --text:      #0F1923;
+      --text-mid:  #4A5568;
+      --text-lt:   #718096;
+      --border:    #E2E8F0;
+      --success:   #2D7A4F;
+      --success-bg:#E8F5EE;
+      --error:     #C53030;
+      --error-bg:  #FFF5F5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--off-white);
+      color: var(--text);
+      direction: rtl;
+      text-align: right;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOP BAR ─────────────────────────────── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .logo { display: flex; align-items: baseline; gap: 2px; text-decoration: none; }
+    .logo .ai { font-size: 17px; font-weight: 700; color: var(--gold); }
+    .logo .bl { font-size: 17px; font-weight: 600; color: var(--navy); }
+    .back-link {
+      font-size: 13px;
+      color: var(--text-mid);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--navy); }
+
+    /* ── MAIN WRAP ───────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* ── CARD ────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 32px rgba(26,55,102,.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 24px; left: 24px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--navy-mid));
+      border-radius: 0 0 3px 3px;
+    }
+
+    /* ── STEPS INDICATOR ─────────────────────── */
+    .steps-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 32px;
+    }
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-lt);
+      transition: all .3s;
+      position: relative;
+      z-index: 1;
+    }
+    .step-dot.active {
+      border-color: var(--navy);
+      background: var(--navy);
+      color: var(--white);
+    }
+    .step-dot.done {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+    .step-line {
+      height: 2px;
+      width: 48px;
+      background: var(--border);
+      transition: background .3s;
+    }
+    .step-line.done { background: var(--success); }
+    .step-label {
+      position: absolute;
+      top: 34px;
+      font-size: 10px;
+      color: var(--text-lt);
+      white-space: nowrap;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .step-dot.active .step-label { color: var(--navy); font-weight: 500; }
+    .step-dot.done .step-label   { color: var(--success); }
+
+    /* ── SCREEN TRANSITIONS ──────────────────── */
+    .screen {
+      display: none;
+      animation: fadeIn .3s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SCREEN HEADERS ──────────────────────── */
+    .screen-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: var(--navy-tint);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+    .screen-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy-dark);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .screen-sub {
+      font-size: 14px;
+      color: var(--text-mid);
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+    .screen-sub strong { color: var(--navy); font-weight: 600; }
+
+    /* ── FORM FIELDS ─────────────────────────── */
+    .field { margin-bottom: 16px; }
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .field-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Heebo', sans-serif;
+      color: var(--text);
+      background: var(--off-white);
+      direction: rtl;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      outline: none;
+    }
+    .field-input:focus {
+      border-color: var(--navy-mid);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(42,82,152,.1);
+    }
+    .field-input.error {
+      border-color: var(--error);
+      background: var(--error-bg);
+    }
+    .field-input.valid {
+      border-color: var(--success);
+    }
+    .field-hint {
+      font-size: 12px;
+      color: var(--text-lt);
+      margin-top: 4px;
+    }
+    .field-error {
+      font-size: 12px;
+      color: var(--error);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Phone field with prefix */
+    .phone-wrap {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--off-white);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .phone-wrap:focus-within {
+      border-color: var(--navy-mid);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(42,82,152,.1);
+    }
+    .phone-wrap.error { border-color: var(--error); }
+    .phone-wrap.valid { border-color: var(--success); }
+    .phone-prefix {
+      padding: 0 12px;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-mid);
+      font-weight: 500;
+      border-left: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .phone-input {
+      flex: 1;
+      height: 44px;
+      padding: 0 12px;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-family: 'Heebo', sans-serif;
+      color: var(--text);
+      direction: ltr;
+      text-align: left;
+      outline: none;
+    }
+
+    /* Checkbox */
+    .checkbox-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 5px;
+      accent-color: var(--navy);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .checkbox-text {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+    .checkbox-text a { color: var(--navy-mid); text-decoration: underline; }
+
+    /* ── BUTTONS ─────────────────────────────── */
+    .btn-primary {
+      width: 100%;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(26,55,102,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: var(--navy-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26,55,102,.3);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      background: var(--border);
+      color: var(--text-lt);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-primary.loading {
+      background: var(--navy-mid);
+      pointer-events: none;
+    }
+
+    .btn-ghost {
+      background: none;
+      border: none;
+      color: var(--navy-mid);
+      font-size: 13px;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      padding: 4px;
+      text-decoration: underline;
+      transition: color .2s;
+    }
+    .btn-ghost:hover { color: var(--navy-dark); }
+
+    /* ── OTP BOXES ───────────────────────────── */
+    .otp-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      direction: ltr;
+    }
+    .otp-box {
+      width: 50px; height: 58px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--navy-dark);
+      font-family: 'Heebo', sans-serif;
+      background: var(--off-white);
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      outline: none;
+      caret-color: var(--navy);
+    }
+    .otp-box:focus {
+      border-color: var(--navy-mid);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(42,82,152,.12);
+    }
+    .otp-box.filled {
+      border-color: var(--navy);
+      background: var(--navy-tint);
+      color: var(--navy-dark);
+    }
+    .otp-box.error-box {
+      border-color: var(--error);
+      background: var(--error-bg);
+      animation: shake .3s ease;
+    }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      25%{transform:translateX(-4px)}
+      75%{transform:translateX(4px)}
+    }
+    .otp-hint {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-lt);
+      margin-bottom: 24px;
+    }
+    .otp-resend {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-lt);
+    }
+    .resend-timer { font-weight: 600; color: var(--navy-mid); }
+
+    /* ── PHONE DISPLAY ───────────────────────── */
+    .phone-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--navy-tint);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 24px;
+    }
+    .phone-display-num {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+      direction: ltr;
+    }
+    .phone-display-label {
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+
+    /* ── SUCCESS SCREEN ──────────────────────── */
+    .success-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--success-bg);
+      border: 3px solid var(--success);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      animation: popIn .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .checkmark {
+      width: 32px; height: 32px;
+      stroke: var(--success);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 50;
+      stroke-dashoffset: 50;
+      animation: drawCheck .4s ease .3s forwards;
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .identity-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--success-bg);
+      border: 1px solid rgba(45,122,79,.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 20px 0;
+    }
+    .badge-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--success);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .badge-text-title { font-size: 13px; font-weight: 600; color: var(--success); }
+    .badge-text-sub   { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+
+    .client-name {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-dark);
+      margin-bottom: 6px;
+    }
+    .client-phone {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-lt);
+      direction: ltr;
+      margin-bottom: 24px;
+    }
+
+    .next-steps {
+      background: var(--off-white);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .next-steps-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-lt);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+    }
+    .next-step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+    .next-step-item:last-child { border-bottom: none; }
+    .step-num-badge {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--navy-tint);
+      color: var(--navy-mid);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-gold {
+      width: 100%;
+      height: 50px;
+      border-radius: 25px;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(200,146,58,.3);
+      transition: background .2s, transform .15s;
+    }
+    .btn-gold:hover { background: #b07d30; transform: translateY(-1px); }
+
+    /* ── LOADING SPINNER ─────────────────────── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── DIVIDER ─────────────────────────────── */
+    .divider {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-lt);
+      margin: 20px 0 16px;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider::before { right: 0; }
+    .divider::after  { left: 0; }
+
+    /* ── SECURITY NOTE ───────────────────────── */
+    .security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-lt);
+    }
+    .security-note svg { width: 13px; height: 13px; color: var(--success); }
+
+    /* ── TOAST ───────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--navy-dark);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Heebo', sans-serif;
+      transition: transform .3s cubic-bezier(.175,.885,.32,1.275);
+      z-index: 100;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; border-radius: 16px; }
+      .otp-box { width: 42px; height: 52px; font-size: 22px; }
+      .field-row { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    חזרה לאתר
+  </a>
+  <a href="index.html" class="logo">
+    <span class="ai">AI</span>
+    <span class="bl"> ביטוח לאומי</span>
+  </a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="card">
+
+    <!-- STEP INDICATOR -->
+    <div class="steps-wrap">
+      <div class="step-dot active" id="dot1">
+        1
+        <span class="step-label">פרטים</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-dot" id="dot2">
+        2
+        <span class="step-label">אימות</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-dot" id="dot3">
+        3
+        <span class="step-label">מאושר</span>
+      </div>
+    </div>
+
+    <!-- ── SCREEN 1: DETAILS ── -->
+    <div class="screen active" id="screen1">
+      <div class="screen-icon">📋</div>
+      <div class="screen-title">יצירת חשבון</div>
+      <div class="screen-sub">השלב הראשון לבדיקת הזכויות שלך.<br>מספר שניות בלבד.</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="fname">שם פרטי</label>
+          <input class="field-input" type="text" id="fname" placeholder="ישראל" autocomplete="given-name">
+          <div class="field-error" id="fname-err">נא להזין שם פרטי</div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="lname">שם משפחה</label>
+          <input class="field-input" type="text" id="lname" placeholder="ישראלי" autocomplete="family-name">
+          <div class="field-error" id="lname-err">נא להזין שם משפחה</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="phone">מספר טלפון נייד</label>
+        <div class="phone-wrap" id="phone-wrap">
+          <div class="phone-prefix">🇮🇱 +972</div>
+          <input class="phone-input" type="tel" id="phone" placeholder="050 000 0000" maxlength="10" autocomplete="tel">
+        </div>
+        <div class="field-hint">נשלח קוד אימות חד-פעמי למספר זה</div>
+        <div class="field-error" id="phone-err">נא להזין מספר נייד ישראלי תקין</div>
+      </div>
+
+      <label class="checkbox-wrap">
+        <input type="checkbox" id="terms">
+        <span class="checkbox-text">
+          קראתי ואני מסכים/ה ל<a href="#">תנאי השימוש</a> ול<a href="#">מדיניות הפרטיות</a>. הבנתי שהמידע לא מהווה ייעוץ משפטי.
+        </span>
+      </label>
+
+      <button class="btn-primary" id="btn-step1" onclick="handleStep1()">
+        שלח קוד אימות
+      </button>
+
+      <div class="security-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        הנתונים שלך מוגנים ומאוחסנים בישראל בלבד
+      </div>
+    </div>
+
+    <!-- ── SCREEN 2: OTP ── -->
+    <div class="screen" id="screen2">
+      <div class="screen-icon">📱</div>
+      <div class="screen-title">אימות מספר טלפון</div>
+      <div class="screen-sub" id="otp-sub">שלחנו קוד בן 6 ספרות למספר</div>
+
+      <div class="phone-display">
+        <span class="phone-display-label">הטלפון שלך:</span>
+        <span class="phone-display-num" id="phone-shown"></span>
+      </div>
+
+      <div class="otp-wrap" id="otp-wrap">
+        <input class="otp-box" maxlength="1" type="tel" id="otp0" oninput="otpInput(0)" onkeydown="otpKey(event,0)" onfocus="otpFocus(0)">
+        <input class="otp-box" maxlength="1" type="tel" id="otp1" oninput="otpInput(1)" onkeydown="otpKey(event,1)" onfocus="otpFocus(1)">
+        <input class="otp-box" maxlength="1" type="tel" id="otp2" oninput="otpInput(2)" onkeydown="otpKey(event,2)" onfocus="otpFocus(2)">
+        <input class="otp-box" maxlength="1" type="tel" id="otp3" oninput="otpInput(3)" onkeydown="otpKey(event,3)" onfocus="otpFocus(3)">
+        <input class="otp-box" maxlength="1" type="tel" id="otp4" oninput="otpInput(4)" onkeydown="otpKey(event,4)" onfocus="otpFocus(4)">
+        <input class="otp-box" maxlength="1" type="tel" id="otp5" oninput="otpInput(5)" onkeydown="otpKey(event,5)" onfocus="otpFocus(5)">
+      </div>
+      <div class="otp-hint">הזן את הקוד שקיבלת ב-SMS · לצורך הדגמה: <strong>123456</strong></div>
+
+      <button class="btn-primary" id="btn-step2" onclick="handleStep2()" disabled>
+        אמת את הקוד
+      </button>
+
+      <div class="otp-resend">
+        לא קיבלת קוד?
+        <span id="resend-section">
+          <span>שלח שוב בעוד </span><span class="resend-timer" id="timer">30</span><span> שניות</span>
+        </span>
+        <button class="btn-ghost" id="resend-btn" style="display:none" onclick="resendCode()">שלח מחדש</button>
+      </div>
+
+      <div class="divider">או</div>
+
+      <button class="btn-ghost" onclick="goBack()" style="width:100%;text-align:center;padding:8px">
+        חזרה לשינוי פרטים
+      </button>
+    </div>
+
+    <!-- ── SCREEN 3: SUCCESS ── -->
+    <div class="screen" id="screen3">
+      <div class="success-icon">
+        <svg class="checkmark" viewBox="0 0 32 32">
+          <polyline points="6,17 13,24 26,10"/>
+        </svg>
+      </div>
+
+      <div class="screen-title">זהות אומתה בהצלחה</div>
+      <div class="client-name" id="success-name"></div>
+      <div class="client-phone" id="success-phone"></div>
+
+      <div class="identity-badge">
+        <div class="badge-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>
+        </div>
+        <div>
+          <div class="badge-text-title">זיהוי רמה 1 — מאושר</div>
+          <div class="badge-text-sub">מספר הטלפון אומת בהצלחה · ניתן להתחיל</div>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <div class="next-steps-title">מה הלאה?</div>
+        <div class="next-step-item">
+          <div class="step-num-badge">1</div>
+          בוט הזכאות ישאל אותך כמה שאלות — ללא מסמכים
+        </div>
+        <div class="next-step-item">
+          <div class="step-num-badge">2</div>
+          קבל הערכה ברורה — האם מגיע לך מביטוח לאומי
+        </div>
+        <div class="next-step-item">
+          <div class="step-num-badge">3</div>
+          המשך לניתוח מלא אם תרצה — 380 ₪ בלבד
+        </div>
+      </div>
+
+      <button class="btn-gold" onclick="startBot()">
+        התחל את בדיקת הזכאות →
+      </button>
+
+      <div class="security-note" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        ניתן לעצור ולחדש את התהליך בכל עת
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let userData = {};
+  let timerInterval;
+
+  // ── VALIDATION ──────────────────────────────
+  function validatePhone(p) {
+    const clean = p.replace(/[\s\-]/g, '');
+    return /^0[5][0-9]{8}$/.test(clean);
+  }
+  function validateName(n) { return n.trim().length >= 2; }
+
+  // ── STEP 1 ───────────────────────────────────
+  function handleStep1() {
+    const fname  = document.getElementById('fname').value;
+    const lname  = document.getElementById('lname').value;
+    const phone  = document.getElementById('phone').value;
+    const terms  = document.getElementById('terms').checked;
+    let valid = true;
+
+    document.getElementById('fname').classList.remove('error');
+    document.getElementById('lname').classList.remove('error');
+    document.getElementById('phone-wrap').classList.remove('error');
+    document.getElementById('fname-err').classList.remove('show');
+    document.getElementById('lname-err').classList.remove('show');
+    document.getElementById('phone-err').classList.remove('show');
+
+    if (!validateName(fname)) {
+      document.getElementById('fname').classList.add('error');
+      document.getElementById('fname-err').classList.add('show');
+      valid = false;
+    }
+    if (!validateName(lname)) {
+      document.getElementById('lname').classList.add('error');
+      document.getElementById('lname-err').classList.add('show');
+      valid = false;
+    }
+    if (!validatePhone(phone)) {
+      document.getElementById('phone-wrap').classList.add('error');
+      document.getElementById('phone-err').classList.add('show');
+      valid = false;
+    }
+    if (!terms) {
+      showToast('יש לאשר את תנאי השימוש להמשך');
+      valid = false;
+    }
+    if (!valid) return;
+
+    userData = { fname: fname.trim(), lname: lname.trim(), phone: phone.replace(/[\s\-]/g,'') };
+
+    const btn = document.getElementById('btn-step1');
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="spinner"></div> שולח קוד...';
+
+    setTimeout(() => {
+      goToScreen(2);
+      document.getElementById('phone-shown').textContent = formatPhone(userData.phone);
+      startTimer();
+      document.getElementById('otp0').focus();
+      showToast('קוד נשלח ל-' + formatPhone(userData.phone));
+    }, 1400);
+  }
+
+  function formatPhone(p) {
+    return p.replace(/^(0\d{2})(\d{3})(\d{4})$/, '$1-$2-$3');
+  }
+
+  // ── STEP 2: OTP ──────────────────────────────
+  function otpInput(idx) {
+    const box = document.getElementById('otp'+idx);
+    const val = box.value.replace(/\D/g,'');
+    box.value = val;
+    if (val) {
+      box.classList.add('filled');
+      if (idx < 5) document.getElementById('otp'+(idx+1)).focus();
+    } else {
+      box.classList.remove('filled');
+    }
+    checkOtpComplete();
+  }
+
+  function otpKey(e, idx) {
+    if (e.key === 'Backspace' && !document.getElementById('otp'+idx).value && idx > 0) {
+      document.getElementById('otp'+(idx-1)).focus();
+      document.getElementById('otp'+(idx-1)).value = '';
+      document.getElementById('otp'+(idx-1)).classList.remove('filled');
+      checkOtpComplete();
+    }
+    if (e.key === 'ArrowRight' && idx > 0) document.getElementById('otp'+(idx-1)).focus();
+    if (e.key === 'ArrowLeft'  && idx < 5) document.getElementById('otp'+(idx+1)).focus();
+  }
+
+  function otpFocus(idx) {
+    document.getElementById('otp'+idx).select();
+  }
+
+  function checkOtpComplete() {
+    let code = '';
+    for (let i=0; i<6; i++) code += document.getElementById('otp'+i).value;
+    const btn = document.getElementById('btn-step2');
+    btn.disabled = code.length < 6;
+    return code;
+  }
+
+  function handleStep2() {
+    const code = checkOtpComplete();
+    if (code.length < 6) return;
+
+    const btn = document.getElementById('btn-step2');
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="spinner"></div> בודק קוד...';
+
+    setTimeout(() => {
+      if (code === '123456') {
+        clearInterval(timerInterval);
+        goToScreen(3);
+        document.getElementById('success-name').textContent = userData.fname + ' ' + userData.lname;
+        document.getElementById('success-phone').textContent = '+972 ' + formatPhone(userData.phone).replace(/^0/,'');
+      } else {
+        for (let i=0; i<6; i++) {
+          const b = document.getElementById('otp'+i);
+          b.classList.add('error-box');
+          b.classList.remove('filled');
+          setTimeout(() => b.classList.remove('error-box'), 600);
+        }
+        for (let i=0; i<6; i++) {
+          document.getElementById('otp'+i).value = '';
+        }
+        btn.classList.remove('loading');
+        btn.innerHTML = 'אמת את הקוד';
+        btn.disabled = true;
+        document.getElementById('otp0').focus();
+        showToast('קוד שגוי — נסה שוב. קוד ההדגמה: 123456');
+      }
+    }, 1200);
+  }
+
+  // ── PASTE SUPPORT ────────────────────────────
+  document.addEventListener('paste', function(e) {
+    if (document.getElementById('screen2').classList.contains('active')) {
+      const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      if (paste.length === 6) {
+        for (let i=0; i<6; i++) {
+          const b = document.getElementById('otp'+i);
+          b.value = paste[i];
+          b.classList.add('filled');
+        }
+        checkOtpComplete();
+        document.getElementById('otp5').focus();
+      }
+    }
+  });
+
+  // ── TIMER ────────────────────────────────────
+  function startTimer() {
+    let t = 30;
+    document.getElementById('timer').textContent = t;
+    document.getElementById('resend-section').style.display = 'inline';
+    document.getElementById('resend-btn').style.display = 'none';
+
+    timerInterval = setInterval(() => {
+      t--;
+      document.getElementById('timer').textContent = t;
+      if (t <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('resend-section').style.display = 'none';
+        document.getElementById('resend-btn').style.display = 'inline';
+      }
+    }, 1000);
+  }
+
+  function resendCode() {
+    showToast('קוד חדש נשלח לטלפון שלך');
+    document.getElementById('resend-btn').style.display = 'none';
+    for (let i=0; i<6; i++) {
+      document.getElementById('otp'+i).value = '';
+      document.getElementById('otp'+i).classList.remove('filled');
+    }
+    document.getElementById('btn-step2').disabled = true;
+    startTimer();
+    document.getElementById('otp0').focus();
+  }
+
+  // ── NAVIGATION ───────────────────────────────
+  function goBack() {
+    clearInterval(timerInterval);
+    goToScreen(1);
+    const btn = document.getElementById('btn-step1');
+    btn.classList.remove('loading');
+    btn.innerHTML = 'שלח קוד אימות';
+  }
+
+  function goToScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+    updateSteps(n);
+    window.scrollTo(0, 0);
+  }
+
+  function updateSteps(n) {
+    for (let i=1; i<=3; i++) {
+      const dot  = document.getElementById('dot'+i);
+      dot.classList.remove('active','done');
+      if (i < n)       dot.classList.add('done'), dot.innerHTML = '✓<span class="step-label">' + dot.querySelector('.step-label').textContent + '</span>';
+      else if (i === n) dot.classList.add('active');
+    }
+    for (let i=1; i<=2; i++) {
+      const line = document.getElementById('line'+i);
+      line.classList.toggle('done', i < n);
+    }
+  }
+
+  function startBot() {
+    showToast('בוט הזכאות עומד להיפתח...');
+    setTimeout(() => { window.location.href = 'bot.html'; }, 1000);
+  }
+
+  // ── TOAST ────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── REAL-TIME VALIDATION ─────────────────────
+  document.getElementById('fname').addEventListener('input', function() {
+    if (validateName(this.value)) {
+      this.classList.remove('error');
+      this.classList.add('valid');
+      document.getElementById('fname-err').classList.remove('show');
+    }
+  });
+  document.getElementById('lname').addEventListener('input', function() {
+    if (validateName(this.value)) {
+      this.classList.remove('error');
+      this.classList.add('valid');
+      document.getElementById('lname-err').classList.remove('show');
+    }
+  });
+  document.getElementById('phone').addEventListener('input', function() {
+    const v = this.value.replace(/\D/g,'');
+    if (validatePhone(v)) {
+      document.getElementById('phone-wrap').classList.remove('error');
+      document.getElementById('phone-wrap').classList.add('valid');
+      document.getElementById('phone-err').classList.remove('show');
+    } else {
+      document.getElementById('phone-wrap').classList.remove('valid');
+    }
+  });
+
+  // Enter key support
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      if (document.getElementById('screen1').classList.contains('active')) handleStep1();
+      if (document.getElementById('screen2').classList.contains('active')) handleStep2();
+    }
+  });
+</script>
+
+</body>
+</html>
