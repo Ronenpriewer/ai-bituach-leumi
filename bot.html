@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ביטוח לאומי — בדיקת זכאות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #1A3766;
+      --navy-dark: #0F2347;
+      --navy-mid:  #2A5298;
+      --navy-tint: #E8F0FB;
+      --gold:      #C8923A;
+      --gold-lt:   #F5E6D0;
+      --off-white: #F5F7FA;
+      --white:     #FFFFFF;
+      --text:      #0F1923;
+      --text-mid:  #4A5568;
+      --text-lt:   #718096;
+      --border:    #E2E8F0;
+      --success:   #2D7A4F;
+      --success-bg:#E8F5EE;
+      --warning:   #B7791F;
+      --warning-bg:#FFFBEB;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--off-white);
+      color: var(--text);
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ──────────────────────────────── */
+    .header {
+      background: var(--navy-dark);
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--navy-mid));
+    }
+    .header-logo {
+      display: flex; align-items: baseline; gap: 2px;
+      text-decoration: none;
+    }
+    .header-logo .ai { font-size: 16px; font-weight: 700; color: var(--gold); }
+    .header-logo .bl { font-size: 16px; font-weight: 600; color: var(--white); }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+    }
+    .bot-avatar-sm {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--navy-mid);
+      border: 2px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .header-bot-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+    }
+    .header-status {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px;
+      color: rgba(255,255,255,.5);
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #48BB78;
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .5; }
+    }
+
+    .header-back {
+      font-size: 13px;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+      transition: color .2s;
+    }
+    .header-back:hover { color: var(--white); }
+
+    /* ── PROGRESS ────────────────────────────── */
+    .progress-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      flex-shrink: 0;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .progress-label { font-size: 12px; color: var(--text-lt); }
+    .progress-step  { font-size: 12px; font-weight: 500; color: var(--navy-mid); }
+    .progress-bar-bg {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy-mid), var(--gold));
+      border-radius: 2px;
+      transition: width .5s ease;
+      width: 0%;
+    }
+
+    /* ── CHAT AREA ───────────────────────────── */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+    .chat-area::-webkit-scrollbar { width: 4px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── MESSAGES ────────────────────────────── */
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      animation: msgIn .3s ease;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-row.bot  { flex-direction: row; }
+    .msg-row.user { flex-direction: row-reverse; }
+
+    .bot-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--navy);
+      border: 2px solid var(--navy-tint);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .bubble {
+      max-width: 78%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .bubble.bot {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-bottom-right-radius: 4px;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .bubble.user {
+      background: var(--navy);
+      color: var(--white);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble strong { font-weight: 600; }
+
+    /* ── TYPING INDICATOR ────────────────────── */
+    .typing-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .typing-bubble {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-bottom-right-radius: 4px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .typing-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--text-lt);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typingBounce {
+      0%,60%,100% { transform: translateY(0); opacity: .4; }
+      30%          { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ── QUICK REPLIES ───────────────────────── */
+    .replies-wrap {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 14px 16px;
+      flex-shrink: 0;
+    }
+    .replies-hint {
+      font-size: 11px;
+      color: var(--text-lt);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .replies-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .reply-btn {
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 1.5px solid var(--navy-mid);
+      background: var(--white);
+      color: var(--navy-mid);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .reply-btn:hover {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+      transform: translateY(-1px);
+    }
+    .reply-btn:active { transform: translateY(0); }
+    .reply-btn.selected {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+
+    /* ── RESULT CARD ─────────────────────────── */
+    .result-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 320px;
+      box-shadow: 0 4px 16px rgba(26,55,102,.1);
+      animation: msgIn .4s ease;
+    }
+    .result-header {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-header.positive { background: var(--success-bg); }
+    .result-header.partial  { background: var(--warning-bg); }
+    .result-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .result-icon.positive { background: rgba(45,122,79,.15); }
+    .result-icon.partial  { background: rgba(183,121,31,.15); }
+    .result-title { font-size: 14px; font-weight: 700; }
+    .result-title.positive { color: var(--success); }
+    .result-title.partial  { color: var(--warning); }
+    .result-subtitle { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+
+    .result-body { padding: 14px 16px; }
+    .result-range {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .result-range-label { font-size: 12px; color: var(--text-lt); }
+    .result-range-val   { font-size: 16px; font-weight: 700; color: var(--navy-dark); }
+    .result-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .result-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--navy-mid), var(--navy));
+    }
+
+    .result-factors { margin-bottom: 14px; }
+    .result-factor {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px;
+      color: var(--text-mid);
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-factor:last-child { border-bottom: none; }
+    .factor-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .factor-dot.pos { background: var(--success); }
+    .factor-dot.neg { background: #E53E3E; }
+    .factor-dot.neu { background: var(--warning); }
+
+    .result-cta {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Heebo', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      text-align: center;
+      display: block;
+      text-decoration: none;
+    }
+    .result-cta:hover { background: #b07d30; transform: translateY(-1px); }
+
+    .result-disclaimer {
+      font-size: 10px;
+      color: var(--text-lt);
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    /* ── FINAL STATE (no replies) ─────────────── */
+    .replies-wrap.done {
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .restart-btn {
+      font-size: 13px;
+      color: var(--navy-mid);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-family: 'Heebo', sans-serif;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .restart-btn:hover { border-color: var(--navy-mid); color: var(--navy-dark); }
+
+    @media (max-width: 480px) {
+      .bubble { max-width: 88%; font-size: 13px; }
+      .reply-btn { font-size: 12px; padding: 9px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <a href="register.html" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    חזרה
+  </a>
+  <div class="header-center">
+    <div class="bot-avatar-sm">🤖</div>
+    <div>
+      <div class="header-bot-name">בוט הזכאות</div>
+      <div class="header-status">
+        <div class="status-dot"></div>
+        פעיל ומוכן
+      </div>
+    </div>
+  </div>
+  <a href="index.html" class="header-logo">
+    <span class="ai">AI</span>
+    <span class="bl"> ביטוח לאומי</span>
+  </a>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-top">
+    <span class="progress-label">התקדמות בדיקת הזכאות</span>
+    <span class="progress-step" id="progress-text">שאלה 0 מתוך 5</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-bar"></div>
+  </div>
+</div>
+
+<!-- CHAT AREA -->
+<div class="chat-area" id="chat"></div>
+
+<!-- QUICK REPLIES -->
+<div class="replies-wrap" id="replies-wrap">
+  <div class="replies-hint" id="replies-hint">בחר תשובה אחת</div>
+  <div class="replies-grid" id="replies"></div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────
+let step = 0;
+let answers = {};
+let claimType = '';
+let typingTimer = null;
+
+// ── CONVERSATION TREE ─────────────────────────
+const flows = {
+
+  disability: [
+    {
+      q: "קיבלת אבחנה רפואית רשמית ממרופא מומחה?",
+      key: "diagnosis",
+      options: [
+        { text: "כן, יש לי אבחנה מסמכת", weight: 2 },
+        { text: "בתהליך — פגישות בקרוב", weight: 1 },
+        { text: "לא עדיין", weight: 0 }
+      ]
+    },
+    {
+      q: "כמה זמן אתה סובל מהמצב הרפואי?",
+      key: "duration",
+      options: [
+        { text: "יותר מ-12 חודשים", weight: 2 },
+        { text: "6 עד 12 חודשים", weight: 1 },
+        { text: "פחות מ-6 חודשים", weight: 0 }
+      ]
+    },
+    {
+      q: "המצב הרפואי משפיע על יכולתך לעבוד?",
+      key: "work_impact",
+      options: [
+        { text: "לא יכול לעבוד כלל", weight: 2 },
+        { text: "עובד חלקית בקושי", weight: 1 },
+        { text: "עובד אך מרגיש קושי", weight: 1 }
+      ]
+    },
+    {
+      q: "אתה מעל גיל 18 ותושב ישראל?",
+      key: "eligibility_basic",
+      options: [
+        { text: "כן, אזרח ותיק ישראלי", weight: 2 },
+        { text: "כן, אך אני אזרח חדש", weight: 1 },
+        { text: "לא", weight: -1 }
+      ]
+    }
+  ],
+
+  work_accident: [
+    {
+      q: "האירוע קרה במסגרת העבודה או בדרך אליה?",
+      key: "where",
+      options: [
+        { text: "בזמן העבודה עצמה", weight: 2 },
+        { text: "בדרך לעבודה או ממנה", weight: 2 },
+        { text: "לא בטוח", weight: 1 }
+      ]
+    },
+    {
+      q: "דיווחת על האירוע למעסיק שלך?",
+      key: "reported",
+      options: [
+        { text: "כן, דיווחתי מייד", weight: 2 },
+        { text: "כן, אך לאחר זמן מה", weight: 1 },
+        { text: "לא דיווחתי", weight: 0 }
+      ]
+    },
+    {
+      q: "קיבלת טיפול רפואי לאחר האירוע?",
+      key: "medical",
+      options: [
+        { text: "כן, דרך קופת חולים", weight: 2 },
+        { text: "כן, באופן פרטי", weight: 1 },
+        { text: "לא קיבלתי טיפול", weight: 0 }
+      ]
+    },
+    {
+      q: "נפגעת ביכולת לעבוד כתוצאה מהאירוע?",
+      key: "disability_result",
+      options: [
+        { text: "כן, לא יכול לעבוד כלל", weight: 2 },
+        { text: "כן, עובד באופן חלקי", weight: 1 },
+        { text: "חזרתי לעבוד מלא", weight: 1 }
+      ]
+    }
+  ],
+
+  income_support: [
+    {
+      q: "מה מצבך התעסוקתי כרגע?",
+      key: "employment",
+      options: [
+        { text: "לא עובד כלל", weight: 2 },
+        { text: "עובד חלקית בלבד", weight: 1 },
+        { text: "מחפש עבודה באופן פעיל", weight: 1 }
+      ]
+    },
+    {
+      q: "האם אתה רשום בלשכת התעסוקה?",
+      key: "employment_office",
+      options: [
+        { text: "כן, רשום ופעיל", weight: 2 },
+        { text: "לא, אך מתכנן להירשם", weight: 1 },
+        { text: "לא רשום", weight: 0 }
+      ]
+    },
+    {
+      q: "מה גילך?",
+      key: "age",
+      options: [
+        { text: "25 עד 55", weight: 2 },
+        { text: "55 ומעלה", weight: 2 },
+        { text: "מתחת לגיל 25", weight: 1 }
+      ]
+    },
+    {
+      q: "יש לך נכסים או חסכונות משמעותיים?",
+      key: "assets",
+      options: [
+        { text: "לא, אין לי", weight: 2 },
+        { text: "יש לי מעט", weight: 1 },
+        { text: "כן, יש לי חסכונות", weight: 0 }
+      ]
+    }
+  ]
+};
+
+const claimLabels = {
+  disability:      "נכות כללית",
+  work_accident:   "תאונת עבודה",
+  income_support:  "הבטחת הכנסה"
+};
+
+// ── HELPERS ────────────────────────────────────
+const chat    = document.getElementById('chat');
+const replWrap = document.getElementById('replies-wrap');
+const replGrid = document.getElementById('replies');
+const replHint = document.getElementById('replies-hint');
+
+function scrollBottom() {
+  setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
+}
+
+function updateProgress(current, total) {
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent =
+    current === 0 ? 'מתחילים...' : `שאלה ${current} מתוך ${total}`;
+}
+
+function addBotMsg(text, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Show typing
+      const typingRow = document.createElement('div');
+      typingRow.className = 'msg-row bot';
+      typingRow.id = 'typing-indicator';
+      typingRow.innerHTML = `
+        <div class="bot-avatar">🤖</div>
+        <div class="typing-bubble">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>`;
+      chat.appendChild(typingRow);
+      scrollBottom();
+
+      // Replace with real message
+      setTimeout(() => {
+        typingRow.remove();
+        const row = document.createElement('div');
+        row.className = 'msg-row bot';
+        row.innerHTML = `
+          <div class="bot-avatar">🤖</div>
+          <div class="bubble bot">${text}</div>`;
+        chat.appendChild(row);
+        scrollBottom();
+        resolve();
+      }, 900 + Math.random() * 400);
+
+    }, delay);
+  });
+}
+
+function addUserMsg(text) {
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `<div class="bubble user">${text}</div>`;
+  chat.appendChild(row);
+  scrollBottom();
+}
+
+function showReplies(options, onSelect) {
+  replGrid.innerHTML = '';
+  replHint.textContent = 'בחר תשובה אחת';
+  replWrap.className = 'replies-wrap';
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'reply-btn';
+    btn.textContent = typeof opt === 'string' ? opt : opt.text;
+    btn.onclick = () => {
+      // Disable all buttons
+      replGrid.querySelectorAll('.reply-btn').forEach(b => {
+        b.disabled = true;
+        b.style.opacity = '0.5';
+      });
+      btn.classList.add('selected');
+      btn.style.opacity = '1';
+      onSelect(opt);
+    };
+    replGrid.appendChild(btn);
+  });
+}
+
+function hideReplies() {
+  replGrid.innerHTML = '';
+  replHint.textContent = '';
+}
+
+// ── RESULT CALCULATION ─────────────────────────
+function calcResult() {
+  const flow = flows[claimType];
+  let total = 0;
+  let max = flow.length * 2;
+  flow.forEach(q => {
+    const ans = answers[q.key];
+    if (ans !== undefined) total += Math.max(0, ans);
+  });
+  const pct = Math.round((total / max) * 100);
+  return pct;
+}
+
+function buildResultCard(score) {
+  const flow = flows[claimType];
+  const isPositive = score >= 50;
+  const label = claimLabels[claimType];
+
+  let rangeLow, rangeHigh, factors;
+
+  if (claimType === 'disability') {
+    if (score >= 75) { rangeLow = 40; rangeHigh = 60; }
+    else if (score >= 50) { rangeLow = 20; rangeHigh = 40; }
+    else { rangeLow = 10; rangeHigh = 25; }
+    factors = [
+      { text: "אבחנה רפואית רשמית", type: answers.diagnosis >= 2 ? 'pos' : answers.diagnosis === 1 ? 'neu' : 'neg' },
+      { text: "משך הזמן עם המצב הרפואי", type: answers.duration >= 2 ? 'pos' : answers.duration === 1 ? 'neu' : 'neg' },
+      { text: "השפעה על כושר עבודה", type: answers.work_impact >= 2 ? 'pos' : 'neu' },
+      { text: "עמידה בתנאי גיל ואזרחות", type: answers.eligibility_basic >= 2 ? 'pos' : answers.eligibility_basic === 1 ? 'neu' : 'neg' }
+    ];
+  } else if (claimType === 'work_accident') {
+    if (score >= 75) { rangeLow = 15; rangeHigh = 30; }
+    else if (score >= 50) { rangeLow = 8; rangeHigh = 20; }
+    else { rangeLow = 5; rangeHigh = 15; }
+    factors = [
+      { text: "הקשר לעבודה מוכח", type: answers.where >= 2 ? 'pos' : 'neu' },
+      { text: "דיווח למעסיק", type: answers.reported >= 2 ? 'pos' : answers.reported === 1 ? 'neu' : 'neg' },
+      { text: "תיעוד רפואי קיים", type: answers.medical >= 2 ? 'pos' : answers.medical === 1 ? 'neu' : 'neg' },
+      { text: "פגיעה בכושר עבודה", type: answers.disability_result >= 2 ? 'pos' : 'neu' }
+    ];
+  } else {
+    rangeLow = null; rangeHigh = null;
+    factors = [
+      { text: "מצב תעסוקתי", type: answers.employment >= 2 ? 'pos' : 'neu' },
+      { text: "רישום בלשכת תעסוקה", type: answers.employment_office >= 2 ? 'pos' : answers.employment_office === 1 ? 'neu' : 'neg' },
+      { text: "קטגוריית גיל מתאימה", type: answers.age >= 2 ? 'pos' : 'neu' },
+      { text: "העדר נכסים משמעותיים", type: answers.assets >= 2 ? 'pos' : answers.assets === 1 ? 'neu' : 'neg' }
+    ];
+  }
+
+  const barWidth = Math.min(90, Math.max(20, score));
+  const typeClass = isPositive ? 'positive' : 'partial';
+  const icon = isPositive ? '✅' : '⚠️';
+  const title = isPositive ? 'סיכויי זכאות טובים' : 'זכאות חלקית אפשרית';
+  const subtitle = isPositive ? `נמצאו מאפיינים תואמים ל${label}` : 'כדאי לבדוק עם מומחה';
+
+  const rangeHTML = rangeLow !== null ? `
+    <div class="result-range">
+      <span class="result-range-label">טווח נכות משוער</span>
+      <span class="result-range-val">${rangeLow}%–${rangeHigh}%</span>
+    </div>
+    <div class="result-bar-bg">
+      <div class="result-bar-fill" style="width:${barWidth}%"></div>
+    </div>` : `
+    <div class="result-range">
+      <span class="result-range-label">רמת התאמה</span>
+      <span class="result-range-val">${score}%</span>
+    </div>
+    <div class="result-bar-bg">
+      <div class="result-bar-fill" style="width:${barWidth}%"></div>
+    </div>`;
+
+  const factorsHTML = factors.map(f => `
+    <div class="result-factor">
+      <div class="factor-dot ${f.type}"></div>
+      ${f.text}
+    </div>`).join('');
+
+  const card = document.createElement('div');
+  card.className = 'msg-row bot';
+  card.innerHTML = `
+    <div class="bot-avatar">🤖</div>
+    <div class="result-card">
+      <div class="result-header ${typeClass}">
+        <div class="result-icon ${typeClass}">${icon}</div>
+        <div>
+          <div class="result-title ${typeClass}">${title}</div>
+          <div class="result-subtitle">${subtitle}</div>
+        </div>
+      </div>
+      <div class="result-body">
+        ${rangeHTML}
+        <div class="result-factors">${factorsHTML}</div>
+        <a href="report.html" class="result-cta">קבל ניתוח מלא — 380 ₪</a>
+        <div class="result-disclaimer">
+          * הערכה זו מבוססת על תשובותיך בלבד ואינה מהווה ייעוץ משפטי.<br>
+          המסמכים הרפואיים שלך עשויים לשנות את התמונה.
+        </div>
+      </div>
+    </div>`;
+  chat.appendChild(card);
+  scrollBottom();
+}
+
+// ── MAIN FLOW ──────────────────────────────────
+async function start() {
+  updateProgress(0, 5);
+  hideReplies();
+
+  await addBotMsg("שלום! 👋 אני הבוט של <strong>AI ביטוח לאומי</strong>.<br>אני כאן לעזור לך להבין אם מגיע לך משהו מביטוח לאומי — ללא מסמכים, ללא התחייבות.");
+  await addBotMsg("אני אשאל אותך כמה שאלות ממוקדות ואתן לך הערכה ברורה. מוכן?", 300);
+
+  setTimeout(() => {
+    showReplies(["כן, בוא נתחיל! 🚀", "יש לי שאלה קודם"], async (opt) => {
+      addUserMsg(typeof opt === 'string' ? opt : opt.text);
+      hideReplies();
+
+      if (opt === "יש לי שאלה קודם") {
+        await addBotMsg("כמובן! כל המידע שתשתף נשמר בצורה מאובטחת ומוצפנת בישראל בלבד. לא נשתף אותו עם שום גורם חיצוני. מוכן להמשיך?", 200);
+        setTimeout(() => {
+          showReplies(["כן, מוכן להמשיך"], async () => {
+            addUserMsg("כן, מוכן להמשיך");
+            hideReplies();
+            await askClaimType();
+          });
+        }, 400);
+      } else {
+        await askClaimType();
+      }
+    });
+  }, 400);
+}
+
+async function askClaimType() {
+  await addBotMsg("מצוין! קודם כל — <strong>באיזה מצב אתה נמצא?</strong>", 200);
+  updateProgress(1, 5);
+
+  setTimeout(() => {
+    showReplies([
+      "יש לי מוגבלות / מחלה כרונית",
+      "עברתי תאונת עבודה",
+      "אני במצב כלכלי קשה"
+    ], async (opt) => {
+      addUserMsg(opt);
+      hideReplies();
+
+      if (opt.includes("מוגבלות") || opt.includes("מחלה")) {
+        claimType = 'disability';
+        await addBotMsg("מבין. נכות כללית היא אחת התביעות הנפוצות — וגם אחת שאנשים רבים לא יודעים שמגיעה להם. 💙", 300);
+      } else if (opt.includes("תאונת")) {
+        claimType = 'work_accident';
+        await addBotMsg("תאונת עבודה היא זכות מוחלטת — גם אם עברה הרבה זמן מאז האירוע. נבדוק יחד. 💪", 300);
+      } else {
+        claimType = 'income_support';
+        await addBotMsg("הבטחת הכנסה היא רשת הביטחון שביטוח לאומי מספק — הרבה אנשים זכאים ולא יודעים. 🤝", 300);
+      }
+
+      setTimeout(() => askFlowQuestion(0), 600);
+    });
+  }, 400);
+}
+
+async function askFlowQuestion(index) {
+  const flow = flows[claimType];
+  if (index >= flow.length) {
+    await finishFlow();
+    return;
+  }
+
+  const q = flow[index];
+  updateProgress(index + 2, 5);
+  await addBotMsg(q.q, 300);
+
+  setTimeout(() => {
+    showReplies(q.options, async (opt) => {
+      addUserMsg(opt.text);
+      answers[q.key] = opt.weight;
+      hideReplies();
+
+      // Smart follow-up comment
+      let comment = '';
+      if (opt.weight === 2) {
+        const positives = [
+          "זה בהחלט עוזר לתיק שלך. ✅",
+          "מצוין — זה גורם חיובי משמעותי.",
+          "טוב מאוד. זה מחזק את הסיכויים.",
+          "כן — זה בדיוק מה שביטוח לאומי מחפש."
+        ];
+        comment = positives[Math.floor(Math.random() * positives.length)];
+      } else if (opt.weight === 0) {
+        const neutrals = [
+          "אני מציין את זה. ממשיכים.",
+          "בסדר — זה פחות חזק אבל לא פוסל.",
+          "מבין. יש עוד גורמים שיכולים לפצות על כך."
+        ];
+        comment = neutrals[Math.floor(Math.random() * neutrals.length)];
+      }
+
+      if (comment && index < flow.length - 1) {
+        await addBotMsg(comment, 200);
+      }
+
+      setTimeout(() => askFlowQuestion(index + 1), 400);
+    });
+  }, 400);
+}
+
+async function finishFlow() {
+  updateProgress(5, 5);
+  hideReplies();
+
+  await addBotMsg("תודה על התשובות. אני מנתח את הפרופיל שלך...", 300);
+
+  setTimeout(async () => {
+    const score = calcResult();
+    const label = claimLabels[claimType];
+
+    const isPositive = score >= 50;
+    if (isPositive) {
+      await addBotMsg(`על בסיס מה שסיפרת, <strong>נמצאו מאפיינים תואמים לתביעת ${label}</strong>. הנה ההערכה הראשונית שלך:`, 200);
+    } else {
+      await addBotMsg(`ישנם מאפיינים שיכולים להצדיק בדיקה מעמיקה יותר של תביעת ${label}. הנה מה שמצאתי:`, 200);
+    }
+
+    setTimeout(() => {
+      buildResultCard(score);
+
+      // Final message + restart
+      setTimeout(async () => {
+        await addBotMsg("⚠️ <strong>חשוב לדעת:</strong> הערכה זו מבוססת על מה שסיפרת בלבד. המסמכים הרפואיים שלך עשויים לגלות הרבה יותר — לטוב ולרע. הניתוח המלא כולל בדיקת כל המסמכים.", 600);
+
+        replWrap.className = 'replies-wrap done';
+        replGrid.innerHTML = '';
+        replHint.textContent = '';
+        replWrap.innerHTML = `
+          <button class="restart-btn" onclick="restartBot()">↺ התחל בדיקה מחדש</button>`;
+
+      }, 800);
+    }, 600);
+  }, 1500);
+}
+
+function restartBot() {
+  step = 0;
+  answers = {};
+  claimType = '';
+  chat.innerHTML = '';
+  updateProgress(0, 5);
+  start();
+}
+
+// ── INIT ───────────────────────────────────────
+start();
+</script>
+
+</body>
+</html>
