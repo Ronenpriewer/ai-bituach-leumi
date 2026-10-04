@@ -14,3 +14,10 @@
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
  
+
+# Internal docs live in the repo but must not be served by the site
+[[redirects]]
+  from = "/docs/*"
+  to = "/404"
+  status = 404
+  force = true
